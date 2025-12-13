@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 260px;
+            right: 0;
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 90;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .navbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .btn-edit:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+            padding: 2rem 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #e5e7eb;
+            color: #2563eb;
+        }
+
+        .sidebar-nav a.active {
+            background: #dbeafe;
+            color: #2563eb;
+            border-right: 3px solid #2563eb;
+        }
+
+        .sidebar-nav i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            margin-top: 70px;
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+        }
+
+        /* Image Section */
+        .image-section {
+            position: sticky;
+            top: 90px;
+            height: fit-content;
+        }
+
+        .main-image-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #f9fafb;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+        }
+
+        .thumbnail {
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .thumbnail:hover {
+            border-color: #2563eb;
+        }
+
+        .thumbnail.active {
+            border-color: #2563eb;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Info Section */
+        .info-section {
+            padding-top: 1rem;
+        }
+
+        .product-category {
+            display: inline-block;
+            padding: 0.375rem 0.75rem;
+            background: #e0e7ff;
+            color: #3730a3;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .product-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .price-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .price-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .buy-now-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .buy-now-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .product-info-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            font-size: 1.5rem;
+            color: #1f2937;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #d1d5db;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle.active {
+            background: #2563eb;
+        }
+
+        .toggle-circle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        .toggle.active .toggle-circle {
+            transform: translateX(24px);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 0.875rem;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit {
+            flex: 1;
+            padding: 0.875rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-delete-confirm {
+            flex: 1;
+            padding: 0.875rem;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-delete-confirm:hover {
+            background: #b91c1c;
+        }
+
+        .btn-submit:disabled,
+        .btn-delete-confirm:disabled,
+        .btn-cancel:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .delete-modal-body {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .delete-icon {
+            width: 80px;
+            height: 80px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .delete-icon i {
+            font-size: 2.5rem;
+            color: #dc2626;
+        }
+
+        .delete-modal-body h4 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .delete-modal-body p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 1024px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+            }
+
+            .image-section {
+                position: relative;
+                top: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .navbar {
+                left: 0;
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .price {
+                font-size: 2rem;
+            }
+
+            .thumbnail-list {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .navbar-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .action-btn {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="navbar-left">
+                <button class="back-btn" onclick="goBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="navbar-title">Product Details</div>
+            </div>
+            <div class="navbar-actions">
+                <button class="action-btn btn-edit" onclick="openEditModal()">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="action-btn btn-delete" onclick="openDeleteModal()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-cube"></i> Dashboard
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="products.html" class="active"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="account.html"><i class="fas fa-user"></i> Account</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="product-detail-container">
+                <!-- Image Section -->
+                <div class="image-section">
+                    <div class="main-image-container">
+                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop" alt="Product" class="main-image" id="mainImage">
+                    </div>
+                    <div class="thumbnail-list">
+                        <div class="thumbnail active" onclick="changeImage(this, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop')">
+                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Thumbnail">
+                        </div>
+                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop')">
+                            <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=200&h=200&fit=crop" alt="Thumbnail">
+                        </div>
+                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1545127398-14699f92334b?w=600&h=600&fit=crop')">
+                            <img src="https://images.unsplash.com/photo-1545127398-14699f92334b?w=200&h=200&fit=crop" alt="Thumbnail">
+                        </div>
+                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=600&h=600&fit=crop')">
+                            <img src="https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=200&h=200&fit=crop" alt="Thumbnail">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Section -->
+                <div class="info-section">
+                    <span class="product-category">Electronics</span>
+                    <h1 class="product-title">Premium Wireless Headphones with Active Noise Cancellation</h1>
+                    
+                    <div class="product-status">
+                        <span class="status-badge status-active">
+                            <i class="fas fa-check-circle"></i> Active
+                        </span>
+                    </div>
+
+                    <div class="price-section">
+                        <div class="price-label">Price</div>
+                        <div class="price">$199.99</div>
+                    </div>
+
+                    <button class="buy-now-btn">
+                        <i class="fas fa-shopping-cart"></i>
+                        Buy Now
+                    </button>
+
+                    <div class="product-info-card">
+                        <div class="info-title">Product Information</div>
+                        <div class="info-row">
+                            <span class="info-label">Product ID</span>
+                            <span class="info-value">#PRD-12345</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Category</span>
+                            <span class="info-value">Electronics</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status</span>
+                            <span class="info-value">Active</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Added Date</span>
+                            <span class="info-value">Jan 15, 2024</span>
+                        </div>
+                    </div>
+
+                    <div class="product-info-card">
+                        <div class="info-title">Product Description</div>
+                        <p style="color: #6b7280; line-height: 1.6;">
+                            Experience superior sound quality with our premium wireless headphones. 
+                            Featuring advanced active noise cancellation technology, comfortable 
+                            over-ear design, and long-lasting battery life. Perfect for music lovers, 
+                            commuters, and professionals who demand the best audio experience.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Product</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form onsubmit="handleEdit(event)">
+                <div class="form-group">
+                    <label for="editName">Product Name</label>
+                    <input type="text" id="editName" value="Premium Wireless Headphones with Active Noise Cancellation">
+                </div>
+                <div class="form-group">
+                    <label for="editPrice">Price</label>
+                    <input type="number" id="editPrice" value="199.99" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <select id="editCategory">
+                        <option value="electronics" selected>Electronics</option>
+                        <option value="fashion">Fashion</option>
+                        <option value="sports">Sports</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mainImage">Main Image</label>
+                    <input type="file" id="mainImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="sideImage">Side Image</label>
+                    <input type="file" id="sideImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="backImage">Back Image</label>
+                    <input type="file" id="backImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="upImage">Top Image</label>
+                    <input type="file" id="upImage" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Active Status</label>
+                    <div class="toggle-wrapper">
+                        <div class="toggle active" id="editToggle" onclick="toggleEditActive()">
+                            <div class="toggle-circle"></div>
+                        </div>
+                        <span id="editToggleLabel">Active</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()" id="editCancelBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-submit" id="editSubmitBtn">
+                        <span id="editBtnText">Update Product</span>
+                        <div class="spinner" id="editSpinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Delete Product</h3>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="delete-modal-body">
+                <div class="delete-icon">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h4>Are you sure?</h4>
+                <p>Do you really want to delete this product? This action cannot be undone.</p>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeDeleteModal()" id="deleteCancelBtn">
+                    Cancel
+                </button>
+                <button type="button" class="btn-delete-confirm" onclick="handleDelete()" id="deleteConfirmBtn">
+                    <span id="deleteBtnText">Delete Product</span>
+                    <div class="spinner" id="deleteSpinner" style="display: none;"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Change main image
+        function changeImage(thumbnail, imageUrl) {
+            document.getElementById('mainImage').src = imageUrl;
+            document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+            thumbnail.classList.add('active');
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Edit Modal
+        function openEditModal() {
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        function toggleEditActive() {
+            const toggle = document.getElementById('editToggle');
+            const label = document.getElementById('editToggleLabel');
+            toggle.classList.toggle('active');
+            label.textContent = toggle.classList.contains('active') ? 'Active' : 'Inactive';
+        }
+
+        function handleEdit(event) {
+            event.preventDefault();
+            
+            const submitBtn = document.getElementById('editSubmitBtn');
+            const cancelBtn = document.getElementById('editCancelBtn');
+            const btnText = document.getElementById('editBtnText');
+            const spinner = document.getElementById('editSpinner');
+            
+            // Disable buttons and show spinner
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Re-enable buttons and hide spinner
+                submitBtn.disabled = false;
+                cancelBtn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+                
+                // Close modal and show success
+                closeEditModal();
+                alert('Product updated successfully!');
+            }, 2000);
+        }
+
+        // Delete Modal
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+        }
+
+        function handleDelete() {
+            const deleteBtn = document.getElementById('deleteConfirmBtn');
+            const cancelBtn = document.getElementById('deleteCancelBtn');
+            const btnText = document.getElementById('deleteBtnText');
+            const spinner = document.getElementById('deleteSpinner');
+            
+            // Disable buttons and show spinner
+            deleteBtn.disabled = true;
+            cancelBtn.disabled = true;
+            btnText.style.display = 'none';
+            spinner.style.display = 'block';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Close modal and redirect
+                closeDeleteModal();
+                alert('Product deleted successfully!');
+                // window.location.href = 'products.html';
+                
+                // Re-enable buttons (for demo purposes)
+                deleteBtn.disabled = false;
+                cancelBtn.disabled = false;
+                btnText.style.display = 'block';
+                spinner.style.display = 'none';
+            }, 2000);
+        }
+
+        // Close modals on outside click
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
+</body>
+</html>

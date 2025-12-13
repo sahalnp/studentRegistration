@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BlueCart - Home</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f5f5f5;
+                padding-top: 80px;
+                padding-bottom: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Modern Navbar */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+                z-index: 1000;
+                padding: 0 30px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .navbar-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 80px;
+                position: relative;
+            }
+
+            .navbar-logo {
+                position: absolute;
+                left: 0;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2563eb;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .navbar-logo span {
+                font-size: 1.8rem;
+            }
+
+            .navbar-menu {
+                display: flex;
+                gap: 40px;
+                list-style: none;
+                align-items: center;
+            }
+
+            .navbar-menu a {
+                text-decoration: none;
+                color: #4b5563;
+                font-weight: 500;
+                font-size: 1rem;
+                transition: color 0.3s;
+                position: relative;
+            }
+
+            .navbar-menu a:hover {
+                color: #2563eb;
+            }
+
+            .navbar-menu a.active {
+                color: #2563eb;
+            }
+
+            .navbar-menu a.active::after {
+                content: "";
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: #2563eb;
+            }
+
+            .mobile-menu-btn {
+                position: absolute;
+                right: 0;
+                display: none;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #4b5563;
+            }
+
+            /* Main Content Wrapper */
+            .main-content {
+                flex: 1;
+            }
+
+            /* Modern Footer */
+            .footer {
+                background: #1f2937;
+                color: #ffffff;
+                padding: 60px 0 20px;
+                margin-top: 80px;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+            .footer-content {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 40px;
+                margin-bottom: 40px;
+            }
+
+            .footer-section h3 {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+
+            .footer-section ul {
+                list-style: none;
+            }
+
+            .footer-section ul li {
+                margin-bottom: 12px;
+            }
+
+            .footer-section ul li a {
+                color: #9ca3af;
+                text-decoration: none;
+                transition: color 0.3s;
+                font-size: 0.95rem;
+            }
+
+            .footer-section ul li a:hover {
+                color: #60a5fa;
+            }
+
+            .footer-section p {
+                color: #9ca3af;
+                line-height: 1.6;
+                font-size: 0.95rem;
+            }
+
+            .footer-logo {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #60a5fa;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .footer-social {
+                display: flex;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .social-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #374151;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                text-decoration: none;
+                transition: background 0.3s, transform 0.2s;
+                font-size: 1.2rem;
+            }
+
+            .social-icon:hover {
+                background: #60a5fa;
+                transform: translateY(-3px);
+            }
+
+            .footer-bottom {
+                border-top: 1px solid #374151;
+                padding-top: 30px;
+                text-align: center;
+            }
+
+            .footer-bottom p {
+                color: #9ca3af;
+                font-size: 0.9rem;
+            }
+
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: #9ca3af;
+                text-decoration: none;
+                font-size: 0.9rem;
+                transition: color 0.3s;
+            }
+
+            .footer-links a:hover {
+                color: #60a5fa;
+            }
+
+            /* Mobile Menu */
+            @media (max-width: 768px) {
+                .navbar-menu {
+                    position: fixed;
+                    top: 80px;
+                    left: -100%;
+                    width: 100%;
+                    height: calc(100vh - 80px);
+                    background: white;
+                    flex-direction: column;
+                    gap: 0;
+                    padding: 20px;
+                    transition: left 0.3s;
+                }
+
+                .navbar-menu.active {
+                    left: 0;
+                }
+
+                .navbar-menu li {
+                    width: 100%;
+                    padding: 15px 0;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+
+                .mobile-menu-btn {
+                    display: block;
+                }
+
+                .footer-content {
+                    grid-template-columns: 1fr;
+                    gap: 30px;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+            }
+
+            /* Header - Full Width Blue Section */
+            .hero-section {
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                color: white;
+                padding: 60px 20px;
+                text-align: center;
+                width: 100%;
+                margin-bottom: 40px;
+            }
+
+            .hero-content {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+                font-weight: 700;
+            }
+
+            .hero-content p {
+                font-size: 1.2rem;
+                margin-bottom: 30px;
+                opacity: 0.95;
+            }
+
+            .btn-browse {
+                background-color: white;
+                color: #2563eb;
+                padding: 15px 40px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .btn-browse:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            /* Main Container */
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+                color: #1f2937;
+                margin-bottom: 30px;
+                font-weight: 700;
+            }
+
+            /* Products Grid - Multiple Items Per Row */
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-bottom: 50px;
+            }
+
+            /* Product Card */
+            .product-card {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s, box-shadow 0.3s;
+                cursor: pointer;
+            }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .product-image {
+                width: 100%;
+                height: 250px;
+                background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 4rem;
+                color: #6366f1;
+            }
+
+            .product-info {
+                padding: 20px;
+            }
+
+            .product-category {
+                display: inline-block;
+                background-color: #dbeafe;
+                color: #2563eb;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+
+            .product-title {
+                font-size: 1.3rem;
+                color: #1f2937;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .product-description {
+                color: #6b7280;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                margin-bottom: 15px;
+            }
+
+            .product-price {
+                font-size: 1.8rem;
+                color: #2563eb;
+                font-weight: 700;
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .hero-content h1 {
+                    font-size: 2rem;
+                }
+
+                .hero-content p {
+                    font-size: 1rem;
+                }
+
+                .products-grid {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(250px, 1fr)
+                    );
+                    gap: 20px;
+                }
+
+                .section-title {
+                    font-size: 1.5rem;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .products-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Modern Navbar -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/user/home/" class="navbar-logo">
+                    <span>🛒</span>
+                    BlueCart
+                </a>
+
+                <ul class="navbar-menu" id="navbarMenu">
+                    <li><a href="/user/home/" class="active">Home</a></li>
+                    <li><a href="/user/products/">Products</a></li>
+                    <li><a href="/account/profile/">Account</a></li>
+                </ul>
+
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-content">
+            <!-- Full Width Blue Header -->
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1>Welcome to BlueCart</h1>
+                    <p>
+                        Explore thousands of products with lightning-fast
+                        filters.
+                    </p>
+                    <a href="/user/products" class="btn-browse"
+                        >Browse Products</a
+                    >
+                </div>
+            </div>
+
+            <div class="container">
+                <h2 class="section-title">Latest Products</h2>
+
+                {% if latest|length == 0 %}
+
+                <p
+                    style="
+                        text-align: center;
+                        font-size: 18px;
+                        padding: 20px;
+                        color: #666;
+                    "
+                >
+                    No products found.
+                </p>
+
+                {% else %}
+
+                <div class="products-grid">
+                    {% for product in latest %}
+
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img
+                                src="{{ product.main_image.url }}"
+                                alt="{{ product.name }}"
+                            />
+                        </div>
+
+                        <div class="product-info">
+                            <span class="product-category"
+                                >{{ product.category.name }}</span
+                            >
+
+                            <h3 class="product-title">{{ product.name }}</h3>
+
+                            <p class="product-description">
+                                {{ product.description }}
+                            </p>
+
+                            <div class="product-price">
+                                ${{ product.price }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+
+                {% endif %}
+            </div>
+        </div>
+        <!-- End Main Content -->
+
+        <!-- Modern Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <!-- About Section -->
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <span>🛒</span>
+                            BlueCart
+                        </div>
+                        <p>
+                            Your one-stop destination for quality products at
+                            amazing prices. Shop with confidence and enjoy
+                            lightning-fast delivery.
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon" title="Facebook"
+                                >📘</a
+                            >
+                            <a href="#" class="social-icon" title="Twitter"
+                                >🐦</a
+                            >
+                            <a href="#" class="social-icon" title="Instagram"
+                                >📷</a
+                            >
+                            <a href="#" class="social-icon" title="LinkedIn"
+                                >💼</a
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="/user/home/">Home</a></li>
+                            <li><a href="/user/products/">Products</a></li>
+                            <li><a href="#">Categories</a></li>
+                            <li><a href="#">Deals</a></li>
+                            <li><a href="#">About Us</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Customer Service -->
+                    <div class="footer-section">
+                        <h3>Customer Service</h3>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Shipping Info</a></li>
+                            <li><a href="#">Returns & Exchanges</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Track Order</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- My Account -->
+                    <div class="footer-section">
+                        <h3>My Account</h3>
+                        <ul>
+                            <li><a href="/account/profile/">My Profile</a></li>
+                            <li><a href="#">Order History</a></li>
+                            <li><a href="#">Wishlist</a></li>
+                            <li><a href="#">Newsletter</a></li>
+                            <li><a href="#">Gift Cards</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Footer Bottom -->
+                <div class="footer-bottom">
+                    <p>&copy; 2025 BlueCart. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+            const navbarMenu = document.getElementById("navbarMenu");
+
+            mobileMenuBtn.addEventListener("click", () => {
+                navbarMenu.classList.toggle("active");
+                mobileMenuBtn.textContent = navbarMenu.classList.contains(
+                    "active"
+                )
+                    ? "✕"
+                    : "☰";
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest(".navbar")) {
+                    navbarMenu.classList.remove("active");
+                    mobileMenuBtn.textContent = "☰";
+                }
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href")
+                    );
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth" });
+                    }
+                    // Close mobile menu after click
+                    navbarMenu.classList.remove("active");
+                    mobileMenuBtn.textContent = "☰";
+                });
+            });
+        </script>
+    </body>
+</html>

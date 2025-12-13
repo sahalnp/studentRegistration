@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Account</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+            padding: 2rem 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #e5e7eb;
+            color: #2563eb;
+        }
+
+        .sidebar-nav a.active {
+            background: #dbeafe;
+            color: #2563eb;
+            border-right: 3px solid #2563eb;
+        }
+
+        .sidebar-nav i {
+            margin-right: 0.75rem;
+            width: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 2rem;
+            padding-bottom: 80px;
+            max-width: 800px;
+        }
+
+        .page-title {
+            font-size: 1.875rem;
+            color: #1f2937;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        /* User Info Card */
+        .user-info-card {
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .edit-icon {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: #dbeafe;
+            color: #2563eb;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .edit-icon:hover {
+            background: #2563eb;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .avatar-info h2 {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .avatar-info p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: #1f2937;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-value i {
+            color: #2563eb;
+        }
+
+        /* Edit Mode Section */
+        .edit-section {
+            display: none;
+            background: white;
+            border-radius: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.3s;
+        }
+
+        .edit-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .edit-section h3 {
+            font-size: 1.25rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 0.75rem;
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-save {
+            flex: 1;
+            padding: 0.75rem;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover {
+            background: #1d4ed8;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+            padding: 1.5rem;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-left: 260px;
+        }
+
+        /* Bottom Navigation (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            z-index: 100;
+        }
+
+        .bottom-nav-list {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+        }
+
+        .bottom-nav-item a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav-item a i {
+            font-size: 1.25rem;
+        }
+
+        .bottom-nav-item a.active {
+            color: #2563eb;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+                padding-bottom: 100px;
+            }
+
+            .footer {
+                margin-left: 0;
+                padding-bottom: 70px;
+            }
+
+            .bottom-nav {
+                display: block;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .edit-actions {
+                flex-direction: column;
+            }
+
+            .user-info-card {
+                padding: 1.5rem;
+            }
+
+            .edit-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-cube"></i> Dashboard
+            </div>
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'admins_home' %}"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="{% url 'admins_products' %}"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="{% url 'admins_account' %}" class="active"><i class="fas fa-user"></i> Account</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="page-title">Account Settings</h1>
+
+            <!-- User Info Card -->
+            <div class="user-info-card" id="infoCard">
+                <button class="edit-icon" onclick="toggleEditMode()">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <div class="avatar-section">
+                    <div class="avatar">JD</div>
+                    <div class="avatar-info">
+                        <h2 id="displayName">John Doe</h2>
+                        <p>Member since Jan 2024</p>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Email Address</div>
+                        <div class="info-value">
+                            <i class="fas fa-envelope"></i>
+                            <span id="displayEmail">john.doe@example.com</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Phone Number</div>
+                        <div class="info-value">
+                            <i class="fas fa-phone"></i>
+                            <span id="displayPhone">+1 234 567 8900</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Country Code</div>
+                        <div class="info-value">
+                            <i class="fas fa-globe"></i>
+                            <span id="displayCountry">+1 (USA)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Mode Section -->
+            <div class="edit-section" id="editSection">
+                <h3>Edit Profile</h3>
+                <form>
+                    <div class="form-group">
+                        <label for="editName">Name</label>
+                        <input type="text" id="editName" value="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editEmail">Email</label>
+                        <input type="email" id="editEmail" value="john.doe@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCountryCode">Country Code</label>
+                        <select id="editCountryCode" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;">
+                            <option value="+1">+1 (USA)</option>
+                            <option value="+44">+44 (UK)</option>
+                            <option value="+91">+91 (India)</option>
+                            <option value="+61">+61 (Australia)</option>
+                            <option value="+81">+81 (Japan)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPhone">Phone Number</label>
+                        <input type="tel" id="editPhone" value="234 567 8900">
+                    </div>
+
+                    <div class="edit-actions">
+                        <button type="button" class="btn-cancel" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="button" class="btn-save" onclick="saveChanges()">
+                            <i class="fas fa-check"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Logout Button -->
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Dashboard. All rights reserved.</p>
+        </footer>
+
+        <!-- Bottom Navigation (Mobile) -->
+        <nav class="bottom-nav">
+            <ul class="bottom-nav-list">
+                <li class="bottom-nav-item">
+                    <a href="{% url 'admins_home' %}">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="bottom-nav-item">
+                    <a href="{% url 'admins_products' %}">
+                        <i class="fas fa-box"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li class="bottom-nav-item">
+                    <a href="{% url 'admins_account' %}" class="active">
+                        <i class="fas fa-user"></i>
+                        <span>Account</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>
+        function toggleEditMode() {
+            const editSection = document.getElementById('editSection');
+            const infoCard = document.getElementById('infoCard');
+            
+            editSection.classList.toggle('active');
+            
+            if (editSection.classList.contains('active')) {
+                // Populate edit form with current values
+                document.getElementById('editName').value = document.getElementById('displayName').textContent;
+                document.getElementById('editEmail').value = document.getElementById('displayEmail').textContent;
+                
+                // Scroll to edit section
+                editSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function cancelEdit() {
+            const editSection = document.getElementById('editSection');
+            editSection.classList.remove('active');
+        }
+
+        function saveChanges() {
+            // Get values from edit form
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const countryCode = document.getElementById('editCountryCode').value;
+            const countryText = document.getElementById('editCountryCode').selectedOptions[0].textContent;
+            const phone = document.getElementById('editPhone').value;
+
+            // Update display values
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayEmail').textContent = email;
+            document.getElementById('displayPhone').textContent = countryCode + ' ' + phone;
+            document.getElementById('displayCountry').textContent = countryText;
+
+            // Update avatar initials
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.querySelector('.avatar').textContent = initials;
+
+            // Hide edit section
+            cancelEdit();
+
+            // Show success message (you can implement a toast notification here)
+            alert('Profile updated successfully!');
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Implement logout logic here
+                alert('Logging out...');
+                // window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>BlueCart - Products</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f5f5f5;
+                padding-top: 80px;
+                padding-bottom: 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Modern Navbar - Same as Home Page */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #ffffff;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+                z-index: 1000;
+                padding: 0 30px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .navbar-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 80px;
+                position: relative;
+            }
+
+            .navbar-logo {
+                position: absolute;
+                left: 0;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2563eb;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .navbar-logo span {
+                font-size: 1.8rem;
+            }
+
+            .navbar-menu {
+                display: flex;
+                gap: 40px;
+                list-style: none;
+                align-items: center;
+            }
+
+            .navbar-menu a {
+                text-decoration: none;
+                color: #4b5563;
+                font-weight: 500;
+                font-size: 1rem;
+                transition: color 0.3s;
+                position: relative;
+            }
+
+            .navbar-menu a:hover {
+                color: #2563eb;
+            }
+
+            .navbar-menu a.active {
+                color: #2563eb;
+            }
+
+            .navbar-menu a.active::after {
+                content: "";
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: #2563eb;
+            }
+
+            .navbar-actions {
+                position: absolute;
+                right: 0;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+
+            .nav-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #f3f4f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: background 0.3s, transform 0.2s;
+                font-size: 1.2rem;
+            }
+
+            .nav-icon:hover {
+                background: #e5e7eb;
+                transform: scale(1.05);
+            }
+
+            .nav-icon.cart {
+                position: relative;
+            }
+
+            .cart-badge {
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                background: #ef4444;
+                color: white;
+                font-size: 0.7rem;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 600;
+            }
+
+            .mobile-menu-btn {
+                display: none;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #4b5563;
+            }
+
+            /* Main Content Wrapper */
+            .main-content {
+                flex: 1;
+            }
+
+            /* Products Page Header */
+            .products-header {
+                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                color: white;
+                padding: 40px 20px;
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .products-header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 15px;
+                font-weight: 700;
+            }
+
+            .products-header p {
+                font-size: 1.2rem;
+                opacity: 0.95;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            /* Filter Section */
+            .filter-section {
+                background: white;
+                padding: 25px;
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                margin-bottom: 30px;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .filter-container {
+                display: flex;
+                gap: 20px;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .filter-group {
+                display: flex;
+                gap: 15px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .filter-select {
+                padding: 10px 15px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                background: white;
+                color: #4b5563;
+                font-size: 0.95rem;
+                cursor: pointer;
+                transition: border-color 0.3s;
+                min-width: 150px;
+            }
+
+            .filter-select:focus {
+                outline: none;
+                border-color: #2563eb;
+            }
+
+            .search-box {
+                padding: 10px 15px;
+                border: 2px solid #e5e7eb;
+                border-radius: 8px;
+                background: white;
+                color: #4b5563;
+                font-size: 0.95rem;
+                width: 250px;
+                transition: border-color 0.3s;
+            }
+
+            .search-box:focus {
+                outline: none;
+                border-color: #2563eb;
+            }
+
+            .btn-filter {
+                background: #2563eb;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background 0.3s, transform 0.2s;
+            }
+
+            .btn-filter:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+            }
+
+            /* Results Info */
+            .results-info {
+                max-width: 1400px;
+                margin: 0 auto 20px;
+                padding: 0 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .results-count {
+                color: #6b7280;
+                font-size: 1rem;
+            }
+
+            .sort-options {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+
+            /* Products Grid - Same as Home Page */
+            .products-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 30px;
+                margin-bottom: 50px;
+                max-width: 1400px;
+                margin-left: auto;
+                margin-right: auto;
+                padding: 0 20px;
+            }
+
+            /* Product Card - Same as Home Page */
+            .product-card {
+                background: white;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s, box-shadow 0.3s;
+                cursor: pointer;
+            }
+
+            .product-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            }
+
+            .product-image {
+                width: 100%;
+                height: 250px;
+                background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 4rem;
+                color: #6366f1;
+            }
+
+            .product-info {
+                padding: 20px;
+            }
+
+            .product-category {
+                display: inline-block;
+                background-color: #dbeafe;
+                color: #2563eb;
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+
+            .product-title {
+                font-size: 1.3rem;
+                color: #1f2937;
+                margin-bottom: 10px;
+                font-weight: 600;
+            }
+
+            .product-description {
+                color: #6b7280;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                margin-bottom: 15px;
+            }
+
+            .product-price {
+                font-size: 1.8rem;
+                color: #2563eb;
+                font-weight: 700;
+            }
+
+            /* Pagination */
+            .pagination {
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 50px 0;
+                flex-wrap: wrap;
+            }
+
+            .page-btn {
+                padding: 10px 15px;
+                border: 2px solid #e5e7eb;
+                background: white;
+                color: #4b5563;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-weight: 500;
+            }
+
+            .page-btn:hover {
+                border-color: #2563eb;
+                color: #2563eb;
+            }
+
+            .page-btn.active {
+                background: #2563eb;
+                color: white;
+                border-color: #2563eb;
+            }
+
+            .page-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            /* Modern Footer - Same as Home Page */
+            .footer {
+                background: #1f2937;
+                color: #ffffff;
+                padding: 60px 0 20px;
+                margin-top: 80px;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 0 20px;
+            }
+
+            .footer-content {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 40px;
+                margin-bottom: 40px;
+            }
+
+            .footer-section h3 {
+                font-size: 1.2rem;
+                margin-bottom: 20px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+
+            .footer-section ul {
+                list-style: none;
+            }
+
+            .footer-section ul li {
+                margin-bottom: 12px;
+            }
+
+            .footer-section ul li a {
+                color: #9ca3af;
+                text-decoration: none;
+                transition: color 0.3s;
+                font-size: 0.95rem;
+            }
+
+            .footer-section ul li a:hover {
+                color: #60a5fa;
+            }
+
+            .footer-section p {
+                color: #9ca3af;
+                line-height: 1.6;
+                font-size: 0.95rem;
+            }
+
+            .footer-logo {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #60a5fa;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .footer-social {
+                display: flex;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .social-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: #374151;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ffffff;
+                text-decoration: none;
+                transition: background 0.3s, transform 0.2s;
+                font-size: 1.2rem;
+            }
+
+            .social-icon:hover {
+                background: #60a5fa;
+                transform: translateY(-3px);
+            }
+
+            .footer-bottom {
+                border-top: 1px solid #374151;
+                padding-top: 30px;
+                text-align: center;
+            }
+
+            .footer-bottom p {
+                color: #9ca3af;
+                font-size: 0.9rem;
+            }
+
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+                margin-top: 15px;
+                flex-wrap: wrap;
+            }
+
+            .footer-links a {
+                color: #9ca3af;
+                text-decoration: none;
+                font-size: 0.9rem;
+                transition: color 0.3s;
+            }
+
+            .footer-links a:hover {
+                color: #60a5fa;
+            }
+
+            /* Mobile Menu */
+            @media (max-width: 768px) {
+                .navbar-menu {
+                    position: fixed;
+                    top: 80px;
+                    left: -100%;
+                    width: 100%;
+                    height: calc(100vh - 80px);
+                    background: white;
+                    flex-direction: column;
+                    gap: 0;
+                    padding: 20px;
+                    transition: left 0.3s;
+                }
+
+                .navbar-menu.active {
+                    left: 0;
+                }
+
+                .navbar-menu li {
+                    width: 100%;
+                    padding: 15px 0;
+                    border-bottom: 1px solid #f3f4f6;
+                }
+
+                .mobile-menu-btn {
+                    display: block;
+                }
+
+                .products-header h1 {
+                    font-size: 2rem;
+                }
+
+                .products-header p {
+                    font-size: 1rem;
+                }
+
+                .filter-container {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .filter-group {
+                    justify-content: center;
+                }
+
+                .search-box {
+                    width: 100%;
+                }
+
+                .results-info {
+                    flex-direction: column;
+                    text-align: center;
+                }
+
+                .products-grid {
+                    grid-template-columns: repeat(
+                        auto-fill,
+                        minmax(250px, 1fr)
+                    );
+                    gap: 20px;
+                }
+
+                .footer-content {
+                    grid-template-columns: 1fr;
+                    gap: 30px;
+                }
+
+                .footer-links {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .products-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .filter-group {
+                    flex-direction: column;
+                }
+
+                .filter-select {
+                    width: 100%;
+                }
+            }
+
+            /* Loading Animation */
+            .loading {
+                display: none;
+                text-align: center;
+                padding: 50px;
+                color: #6b7280;
+            }
+
+            .loading.show {
+                display: block;
+            }
+
+            .spinner {
+                border: 3px solid #f3f4f6;
+                border-top: 3px solid #2563eb;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto 20px;
+            }
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Modern Navbar - Same as Home Page -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <a href="/user/home/" class="navbar-logo">
+                    <span>🛒</span>
+                    BlueCart
+                </a>
+
+                <ul class="navbar-menu" id="navbarMenu">
+                    <li><a href="/user/home/">Home</a></li>
+                    <li>
+                        <a href="/user/products/" class="active">Products</a>
+                    </li>
+                    <li><a href="/account/profile/">Account</a></li>
+                </ul>
+
+                <div class="navbar-actions">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        ☰
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Wrapper -->
+        <div class="main-content">
+            <!-- Products Page Header -->
+            <div class="products-header">
+                <h1>All Products</h1>
+                <p>
+                    Discover amazing products with our lightning-fast filters
+                    and search
+                </p>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-container">
+                    <div class="filter-group">
+                        <select class="filter-select" id="categoryFilter">
+                            <option value="">All Categories</option>
+
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}">
+                                {{ cat.category_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+
+                        <select class="filter-select" id="priceFilter">
+    <option value="">Price Range</option>
+    <option value="0-500">₹0 - ₹500</option>
+    <option value="500-1000">₹500 - ₹1000</option>
+    <option value="1000-2000">₹1000 - ₹2000</option>
+    <option value="2000+">₹2000+</option>
+</select>
+
+                    </div>
+
+                    <div class="filter-group">
+                        <input
+                            type="text"
+                            class="search-box"
+                            placeholder="Search products..."
+                            id="searchBox"
+                        />
+                        <button class="btn-filter" onclick="filterProducts()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Info -->
+            <div class="results-info">
+                <div class="results-count">
+                   Showing {{ page_obj|length }} of {{ page_obj.paginator.count }} products
+                    (<span id="resultsCount">{% raw %}{{ page_obj.paginator.count }}{% endraw %}</span>
+                    found)
+                    <span id="totalCount">{products.count}</span> products
+                </div>
+                <div class="sort-options">
+                    <label for="sortSelect" style="color: #6b7280"
+                        >Sort by:</label
+                    >
+                    <select
+                        class="filter-select"
+                        id="sortSelect"
+                        style="min-width: 120px"
+                    >
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">Newest First</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Loading Animation -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading products...</p>
+            </div>
+
+            <!-- Products Grid - Same as Home Page -->
+            <div class="products-grid" id="productsGrid">
+                <div class="products-grid" id="productsGrid">
+                    {% if products|length == 0 %}
+                    <p
+                        style="
+                            grid-column: 1/-1;
+                            text-align: center;
+                            font-size: 18px;
+                            padding: 20px;
+                            color: #666;
+                        "
+                    >
+                        No products found.
+                    </p>
+                    {% else %} {% for product in products %}
+                    <div
+                        class="product-card"
+                        data-category="{{ product.category.slug }}"
+                        data-price="{{ product.price }}"
+                    >
+                        <div class="product-image">
+                            {% if product.main_image %}
+                            <img
+                                src="{{ product.main_image.url }}"
+                                alt="{{ product.name }}"
+                            />
+                            {% else %}
+                            <span style="font-size: 40px; color: #6366f1"
+                                >📦</span
+                            >
+                            {% endif %}
+                        </div>
+
+                        <div class="product-info">
+                            <span class="product-category"
+                                >{{ product.category.category_name }}</span
+                            >
+
+                            <h3 class="product-title">{{ product.name }}</h3>
+
+                            <p class="product-description">
+                                {{ product.description|default:"No description
+                                available." }}
+                            </p>
+
+                            <div class="product-price">
+                                ₹{{ product.price }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %} {% endif %}
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}" class="page-btn">
+        ← Previous
+    </a>
+    {% else %}
+    <button class="page-btn" disabled>← Previous</button>
+    {% endif %}
+
+    {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+            <button class="page-btn active">{{ num }}</button>
+        {% else %}
+            <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="page-btn">
+        Next →
+    </a>
+    {% else %}
+    <button class="page-btn" disabled>Next →</button>
+    {% endif %}
+
+</div>
+
+        </div>
+
+        <!-- Modern Footer - Same as Home Page -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <!-- About Section -->
+                    <div class="footer-section">
+                        <div class="footer-logo">
+                            <span>🛒</span>
+                            BlueCart
+                        </div>
+                        <p>
+                            Your one-stop destination for quality products at
+                            amazing prices. Shop with confidence and enjoy
+                            lightning-fast delivery.
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" class="social-icon" title="Facebook"
+                                >📘</a
+                            >
+                            <a href="#" class="social-icon" title="Twitter"
+                                >🐦</a
+                            >
+                            <a href="#" class="social-icon" title="Instagram"
+                                >📷</a
+                            >
+                            <a href="#" class="social-icon" title="LinkedIn"
+                                >💼</a
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="footer-section">
+                        <h3>Quick Links</h3>
+                        <ul>
+                            <li><a href="/user/home/">Home</a></li>
+                            <li><a href="/user/products/">Products</a></li>
+                            <li><a href="#">Categories</a></li>
+                            <li><a href="#">Deals</a></li>
+                            <li><a href="#">About Us</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Customer Service -->
+                    <div class="footer-section">
+                        <h3>Customer Service</h3>
+                        <ul>
+                            <li><a href="#">Contact Us</a></li>
+                            <li><a href="#">Shipping Info</a></li>
+                            <li><a href="#">Returns & Exchanges</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Track Order</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- My Account -->
+                    <div class="footer-section">
+                        <h3>My Account</h3>
+                        <ul>
+                            <li><a href="/account/profile/">My Profile</a></li>
+                            <li><a href="#">Order History</a></li>
+                            <li><a href="#">Wishlist</a></li>
+                            <li><a href="#">Newsletter</a></li>
+                            <li><a href="#">Gift Cards</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Footer Bottom -->
+                <div class="footer-bottom">
+                    <p>&copy; 2025 BlueCart. All rights reserved.</p>
+                    <div class="footer-links">
+                        <a href="#">Privacy Policy</a>
+                        <a href="#">Terms of Service</a>
+                        <a href="#">Cookie Policy</a>
+                        <a href="#">Sitemap</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <script>
+            // Mobile Menu Toggle
+            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+            const navbarMenu = document.getElementById("navbarMenu");
+
+            mobileMenuBtn.addEventListener("click", () => {
+                navbarMenu.classList.toggle("active");
+                mobileMenuBtn.textContent = navbarMenu.classList.contains(
+                    "active"
+                )
+                    ? "✕"
+                    : "☰";
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest(".navbar")) {
+                    navbarMenu.classList.remove("active");
+                    mobileMenuBtn.textContent = "☰";
+                }
+            });
+
+            // Product filtering functionality
+            function filterProducts() {
+                const loading = document.getElementById("loading");
+                const productsGrid = document.getElementById("productsGrid");
+
+                // Show loading animation
+                loading.classList.add("show");
+                productsGrid.style.opacity = "0.5";
+
+                // Simulate loading delay
+                setTimeout(() => {
+                    loading.classList.remove("show");
+                    productsGrid.style.opacity = "1";
+
+                    // Update results count
+                    const visibleProducts = document.querySelectorAll(
+                        '.product-card[style*="display: none"]'
+                    ).length;
+                    const totalProducts =
+                        document.querySelectorAll(".product-card").length;
+                    document.getElementById("resultsCount").textContent =
+                        totalProducts - visibleProducts;
+                }, 800);
+            }
+
+            // Search functionality
+            document
+                .getElementById("searchBox")
+                .addEventListener("input", function () {
+                    const searchTerm = this.value.toLowerCase();
+                    const products = document.querySelectorAll(".product-card");
+
+                    products.forEach((product) => {
+                        const title = product
+                            .querySelector(".product-title")
+                            .textContent.toLowerCase();
+                        const description = product
+                            .querySelector(".product-description")
+                            .textContent.toLowerCase();
+                        const category = product
+                            .querySelector(".product-category")
+                            .textContent.toLowerCase();
+
+                        if (
+                            title.includes(searchTerm) ||
+                            description.includes(searchTerm) ||
+                            category.includes(searchTerm)
+                        ) {
+                            product.style.display = "block";
+                        } else {
+                            product.style.display = "none";
+                        }
+                    });
+
+                    filterProducts();
+                });
+
+            // Category filter
+            document
+                .getElementById("categoryFilter")
+                .addEventListener("change", function () {
+                    const selectedCategory = this.value;
+                    const products = document.querySelectorAll(".product-card");
+
+                    products.forEach((product) => {
+                        if (
+                            selectedCategory === "" ||
+                            product.dataset.category === selectedCategory
+                        ) {
+                            product.style.display = "block";
+                        } else {
+                            product.style.display = "none";
+                        }
+                    });
+
+                    filterProducts();
+                });
+
+            // Price filter
+            document
+                .getElementById("priceFilter")
+                .addEventListener("change", function () {
+                    const selectedPrice = this.value;
+                    const products = document.querySelectorAll(".product-card");
+
+                    products.forEach((product) => {
+                        const price = parseFloat(product.dataset.price);
+                        let showProduct = false;
+
+                        switch (selectedPrice) {
+                            case "":
+                                showProduct = true;
+                                break;
+                            case "0-50":
+                                showProduct = price >= 0 && price <= 50;
+                                break;
+                            case "50-200":
+                                showProduct = price > 50 && price <= 200;
+                                break;
+                            case "200-500":
+                                showProduct = price > 200 && price <= 500;
+                                break;
+                            case "500+":
+                                showProduct = price > 500;
+                                break;
+                        }
+
+                        product.style.display = showProduct ? "block" : "none";
+                    });
+
+                    filterProducts();
+                });
+
+            document
+                .getElementById("sortSelect")
+                .addEventListener("change", function () {
+                    const sortValue = this.value;
+                    const productsGrid =
+                        document.getElementById("productsGrid");
+                    const products = Array.from(
+                        productsGrid.querySelectorAll(".product-card")
+                    );
+
+                    products.sort((a, b) => {
+                        switch (sortValue) {
+                            case "price-low":
+                                return (
+                                    parseFloat(a.dataset.price) -
+                                    parseFloat(b.dataset.price)
+                                );
+                            case "price-high":
+                                return (
+                                    parseFloat(b.dataset.price) -
+                                    parseFloat(a.dataset.price)
+                                );
+                            case "name":
+                                return a
+                                    .querySelector(".product-title")
+                                    .textContent.localeCompare(
+                                        b.querySelector(".product-title")
+                                            .textContent
+                                    );
+                            default:
+                                return 0;
+                        }
+                    });
+
+                    products.forEach((product) =>
+                        productsGrid.appendChild(product)
+                    );
+                });
+
+            document.querySelectorAll(".product-card").forEach((card) => {
+                card.addEventListener("click", function () {
+                    const productTitle =
+                        this.querySelector(".product-title").textContent;
+                    console.log(`Navigating to product: ${productTitle}`);
+                });
+            });
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(
+                        this.getAttribute("href")
+                    );
+                    if (target) {
+                        target.scrollIntoView({ behavior: "smooth" });
+                    }
+                    // Close mobile menu after click
+                    navbarMenu.classList.remove("active");
+                    mobileMenuBtn.textContent = "☰";
+                });
+            });
+
+            // Initialize page
+            document.addEventListener("DOMContentLoaded", function () {
+                // Update initial results count
+                const totalProducts =
+                    document.querySelectorAll(".product-card").length;
+                document.getElementById("totalCount").textContent =
+                    totalProducts;
+                document.getElementById("resultsCount").textContent =
+                    totalProducts;
+            });
+        </script>
+    </body>
+</html>
