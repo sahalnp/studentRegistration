@@ -23,7 +23,7 @@ class Category(models.Model):
 
 class Products(Base):
     name = models.CharField(max_length=100)
-    main_image = models.ImageField(upload_to="product_images")
+    
     slug = models.SlugField(unique=True, blank=True)
     price = models.DecimalField(max_digits=7, decimal_places=2)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
@@ -47,24 +47,23 @@ class Products(Base):
 
 class ProductImage(models.Model):
     product = models.OneToOneField(Products, on_delete=models.CASCADE)
-    image_side = models.ImageField(upload_to="product_images")
-    image_back = models.ImageField(upload_to="product_images")
-    image_up = models.ImageField(upload_to="product_images")
+    main_image = models.ImageField(upload_to="product_images", null=True, blank=True)
+    image_side = models.ImageField(upload_to="product_images", null=True, blank=True)
+    image_back = models.ImageField(upload_to="product_images", null=True, blank=True)
+    image_up = models.ImageField(upload_to="product_images", null=True, blank=True)
 
 
 @receiver(post_save, sender=ProductImage)
 def resize_images(sender, instance, created, **kwargs):
-    if not created:
-        return
 
     TARGET_SIZE = (840, 840)
-
     image_fields = [
-        ("main_image", instance.product.main_image),
+        ("main_image", instance.main_image),
         ("image_side", instance.image_side),
         ("image_back", instance.image_back),
         ("image_up", instance.image_up),
     ]
+
 
     for field_name, image_field in image_fields:
         try:

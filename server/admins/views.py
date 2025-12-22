@@ -1,3 +1,4 @@
+import profile
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from accounts.models import Profile
@@ -5,9 +6,10 @@ from products.models import Products, Category, ProductImage
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db import transaction, IntegrityError
 
 
-@login_required(login_url="admin_login")
+@login_required(login_url="admins_login")
 def admin_home(request):
     users = Profile.objects.all()
     deletedUser = Profile.objects.filter(is_deleted=True).count()
@@ -22,36 +24,51 @@ def admin_home(request):
             "totalProduct": totalProduct,
             "deletedProduct": deletedProduct,
             "totalUsers": users.count(),
-            
         },
     )
 
 
-@login_required(login_url="admin_login")
+@login_required(login_url="admins_login")
 def add_user(request):
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
-        password = request.POST.get("password")
+        password = "0000"
         phone = request.POST.get("phone")
         country_code = request.POST.get("country_code")
-
+        print(username, email, password, phone, country_code, "sfiodsfsdjfls")
         try:
-            user = User.objects.create_user(
-                username=username, email=email, password=password
-            )
+            if Profile.objects.filter(phone=phone, country_code=country_code).exists():
+                messages.error(request, "Phone number already exists")
+                return redirect("admins_home")
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "Email already exists")
+                return redirect("admins_home")
 
-            Profile.objects.create(phone=phone, country_code=country_code, user=user)
+            with transaction.atomic():
+                # Create user
+                user = User.objects.create_user(
+                    username=username, email=email, password=password
+                )
 
-            messages.success(request, "User created successfully!")
-            return redirect("home")  # 🔥 redirect to admin home
+                # Create profile
+                Profile.objects.create(
+                    user=user, phone=phone, country_code=country_code
+                )
 
+            messages.success(request, "User created successfully")
+            return redirect("admins_home")
+
+        except IntegrityError:
+            messages.error(request, "Phone number already exists")
+            return redirect("admins_home")
         except Exception as e:
-            messages.error(request, f"Failed to create user: {str(e)}")
-            return redirect("home")
+            print("❌ ERROR CREATING USER:", repr(e))
+            messages.error(request, str(e))
+            return redirect("admins_home")
 
 
-@login_required(login_url="admin_login")
+@login_required(login_url="admins_login")
 def delete_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -64,18 +81,17 @@ def delete_user(request, user_id):
         profile.save()
 
         messages.success(request, "User deleted successfully!")
-        return redirect("home")
+        return redirect("admins_home")
 
     except User.DoesNotExist:
         messages.error(request, "User not found!")
-        return redirect("home")
-
+        return redirect("admins_home")
     except Exception as e:
         messages.error(request, f"Error deleting user: {str(e)}")
-        return redirect("home")
+        return redirect("admins_home")
 
 
-@login_required(login_url="admin_login")
+@login_required(login_url="admins_login")
 def edit_user(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -87,45 +103,49 @@ def edit_user(request, user_id):
             phone = request.POST.get("phone")
             country_code = request.POST.get("country_code")
 
-            # Check for duplicate username
+            # Duplicate username
             if User.objects.filter(username=username).exclude(id=user_id).exists():
                 messages.error(request, "Username already exists!")
-                return redirect("home")
+                return redirect("admins_home")
 
-            # Check for duplicate email
+            # Duplicate email
             if User.objects.filter(email=email).exclude(id=user_id).exists():
                 messages.error(request, "Email already registered!")
-                return redirect("home")
+                return redirect("admins_home")
 
-            # Update user
-            user.username = username
-            user.email = email
-            user.save()
+            try:
+                with transaction.atomic():
+                    user.username = username
+                    user.email = email
+                    user.save()
 
-            # Update profile
-            profile.phone = phone
-            profile.country_code = country_code
-            profile.save()
+                    profile.phone = phone
+                    profile.country_code = country_code
+                    profile.save()
 
-            messages.success(request, "User updated successfully!")
-            return redirect("home")
+                messages.success(request, "User updated successfully!")
 
-        return render(
-            request, "admin/edit_user.html", {"user": user, "profile": profile}
-        )
+            except IntegrityError:
+                messages.error(request, "Phone number already exists!")
+
+            return redirect("admins_home")
+
+        # ✅ IMPORTANT: HANDLE GET REQUEST
+        return redirect("admins_home")
 
     except User.DoesNotExist:
         messages.error(request, "User not found!")
-        return redirect("home")
+        return redirect("admins_home")
 
     except Exception as e:
         messages.error(request, f"Error updating user: {str(e)}")
-        return redirect("home")
+    return redirect("admins_home")
 
 
 @login_required(login_url="admin_login")
 def admin_products(request):
-    products = Products.objects.filter(active=True)
+    products = Products.objects.all()
+    print(products, "=================products=================")
     return render(
         request,
         "product.html",
@@ -137,16 +157,19 @@ def admin_products(request):
 def admin_add_product(request):
     if request.method == "POST":
         try:
-            category_name = request.POST.get("category")
+            category_name = request.POST.get("category", "").upper()
             name = request.POST.get("name")
             price = request.POST.get("price")
-
             main_image = request.FILES.get("main_image")
             image_side = request.FILES.get("image_side")
             image_back = request.FILES.get("image_back")
             image_up = request.FILES.get("image_up")
-
-            add_category, created = Category.objects.get_or_create(name=category_name)
+            print(
+                category_name, name, price, main_image, image_side, image_back, image_up
+            )
+            add_category, created = Category.objects.get_or_create(
+                category_name=category_name
+            )
 
             product = Products.objects.create(
                 name=name, price=price, category=add_category
@@ -161,26 +184,28 @@ def admin_add_product(request):
             )
 
             messages.success(request, "Product added successfully!")
-            return redirect("product")
+            return redirect("admins_products")
 
         except Exception as e:
             messages.error(request, f"Error adding product: {str(e)}")
-            return redirect("product")
+            return redirect("admins_products")
 
 
 @login_required(login_url="admin_login")
 def admin_edit_product(request, id):
+    print(id, "=================edit product id=================")
     try:
-        product = Products.objects.get(id=id)
+        product = Products.objects.get(uid=id)
         product_images = ProductImage.objects.get(product=product)
-
+        print(product, product_images, "================      hdhdhdhdh=edit product=================")
         if request.method == "POST":
-            category_name = request.POST.get("category")
+            category_name = request.POST.get("category", "").upper()
             name = request.POST.get("name")
             price = request.POST.get("price")
+            active = request.POST.get("active", "true") == "true"
 
             if category_name:
-                category, created = Category.objects.get_or_create(name=category_name)
+                category, created = Category.objects.get_or_create(category_name=category_name)
                 product.category = category
 
             if name:
@@ -189,6 +214,7 @@ def admin_edit_product(request, id):
             if price:
                 product.price = price
 
+            product.active = active
             product.save()
 
             main_image = request.FILES.get("main_image")
@@ -208,33 +234,30 @@ def admin_edit_product(request, id):
             product_images.save()
 
             messages.success(request, "Product updated successfully!")
-            return redirect("product")
+            return redirect("admins_products")
 
-        return render(
-            request,
-            "admin/edit_product.html",
-            {"product": product, "images": product_images},
-        )
+        return redirect("admins_products")
 
     except Exception as e:
         messages.error(request, f"Error editing product: {str(e)}")
-        return redirect("product")
+        return redirect("admins_products")
 
 
 @login_required(login_url="admin_login")
 def admin_delete_product(request, id):
     try:
-        Products.objects.filter(id=id).update(active=False)
+        Products.objects.filter(uid=id).update(active=False)
         messages.success(request, "Product deleted successfully!")
-        return redirect("product")
+        return redirect("admins_products")
     except Exception as e:
         messages.error(request, f"Error deleting product: {str(e)}")
-        return redirect("product")
+        return redirect("admins_products")
 
 
 def admin_logout(request):
     logout(request)
-    return redirect(login)
+    messages.success(request, "Logged out successfully.")
+    return redirect("login")
 
 
 def admin_login(request):
@@ -255,41 +278,61 @@ def admin_login(request):
         messages.error(request, "Invalid username or password!")
         return redirect("admins_login")
     return render(request, "login.html")
+
+
 @login_required(login_url="admins_login")
-def user_profile(request):
+def admin_profile(request):
+    user = request.user
+    profile = user.profile  # ✅ FIXED
+
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
+        username = request.POST["username"]
+        email = request.POST["email"]
+        country_code = request.POST["country_code"]
+        phone = request.POST["phone"]
 
-        user = request.user
-        profile = user.profile
-
-        # Validate username
         if User.objects.exclude(id=user.id).filter(username=username).exists():
-            messages.error(request, "Username already taken!")
-            return redirect("user_profile")
+            messages.error(request, "Username already taken")
+            return redirect("admins_account")
 
-        # Validate email
         if User.objects.exclude(id=user.id).filter(email=email).exists():
-            messages.error(request, "Email already taken!")
-            return redirect("user_profile")
+            messages.error(request, "Email already taken")
+            return redirect("admins_account")
+        if (
+            Profile.objects.exclude(user=user)
+            .filter(phone=phone, country_code=country_code)
+            .exists()
+        ):
+            messages.error(request, "Phone already exists")
+            return redirect("admins_account")
 
-        country_code = request.POST.get("country_code")
-        phone = request.POST.get("phone")
-
-        # Save user
         user.username = username
         user.email = email
         user.save()
 
-        # Save profile
         profile.country_code = country_code
         profile.phone = phone
         profile.save()
 
-        # Use messages with values
-        success_message = f"Profile updated successfully! Username: {user.username}, Email: {user.email}, Phone: {phone}, Country Code: {country_code}"
-        messages.success(request, success_message)
-        return redirect("user_profile")
+        messages.success(request, "Profile updated successfully")
+        return redirect("admins_account")
 
-    return render(request, "account.html", {"user": request.user})
+    return render(request, "account.html", {"admin": user})
+
+
+@login_required(login_url="admins_login")
+def admin_detail_products(request, id):
+    try:
+        product = Products.objects.get(uid=id)
+        product_images = ProductImage.objects.get(product=product)
+        return render(
+            request,
+            "productDetails.html",
+            {"product": product, "product_images": product_images},
+        )
+    except Products.DoesNotExist:
+        messages.error(request, "Product not found!")
+        return redirect("admins_products")
+    except Exception as e:
+        messages.error(request, f"Error retrieving product details: {str(e)}")
+        return redirect("admins_products")

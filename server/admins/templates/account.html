@@ -18,13 +18,63 @@
             color: #1f2937;
         }
 
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 250px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.4s ease;
+        }
+
+        .toast-success {
+            background: #16a34a;
+        }
+
+        .toast-error {
+            background: #dc2626;
+        }
+
+        .toast-warning {
+            background: #f59e0b;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+
         .container {
             display: flex;
             min-height: 100vh;
             flex-direction: column;
         }
 
-        /* Sidebar Navigation */
         .sidebar {
             position: fixed;
             left: 0;
@@ -78,7 +128,6 @@
             width: 20px;
         }
 
-        /* Main Content */
         .main-content {
             margin-left: 260px;
             flex: 1;
@@ -94,7 +143,6 @@
             margin-bottom: 2rem;
         }
 
-        /* User Info Card */
         .user-info-card {
             background: white;
             border-radius: 1.25rem;
@@ -188,7 +236,6 @@
             color: #2563eb;
         }
 
-        /* Edit Mode Section */
         .edit-section {
             display: none;
             background: white;
@@ -232,7 +279,8 @@
             font-size: 0.875rem;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #d1d5db;
@@ -241,7 +289,8 @@
             transition: border-color 0.2s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #2563eb;
         }
@@ -284,7 +333,6 @@
             background: #1d4ed8;
         }
 
-        /* Logout Button */
         .logout-btn {
             width: 100%;
             padding: 1rem;
@@ -308,7 +356,6 @@
             box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
         }
 
-        /* Footer */
         .footer {
             background: #f9fafb;
             border-top: 1px solid #e5e7eb;
@@ -319,7 +366,6 @@
             margin-left: 260px;
         }
 
-        /* Bottom Navigation (Mobile) */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -358,7 +404,6 @@
             color: #2563eb;
         }
 
-        /* Mobile Styles */
         @media (max-width: 768px) {
             .sidebar {
                 display: none;
@@ -399,8 +444,19 @@
     </style>
 </head>
 <body>
+    {% if messages %}
+    <div class="toast-container" id="djangoToasts">
+        {% for message in messages %}
+            <div class="toast toast-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="toast-container" id="toastContainer"></div>
+
     <div class="container">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <i class="fas fa-cube"></i> Dashboard
@@ -412,21 +468,21 @@
             </ul>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <h1 class="page-title">Account Settings</h1>
 
-            <!-- User Info Card -->
             <div class="user-info-card" id="infoCard">
                 <button class="edit-icon" onclick="toggleEditMode()">
                     <i class="fas fa-edit"></i>
                 </button>
 
                 <div class="avatar-section">
-                    <div class="avatar">JD</div>
+                    <div class="avatar">
+                        {{ admin.username|slice:":2"|upper }}
+                    </div>
                     <div class="avatar-info">
-                        <h2 id="displayName">John Doe</h2>
-                        <p>Member since Jan 2024</p>
+                        <h2 id="displayName">{{admin.username}}</h2>
+                        <p>{{admin.date_joined}}</p>
                     </div>
                 </div>
 
@@ -435,7 +491,7 @@
                         <div class="info-label">Email Address</div>
                         <div class="info-value">
                             <i class="fas fa-envelope"></i>
-                            <span id="displayEmail">john.doe@example.com</span>
+                            <span id="displayEmail">{{admin.email}}</span>
                         </div>
                     </div>
 
@@ -443,7 +499,7 @@
                         <div class="info-label">Phone Number</div>
                         <div class="info-value">
                             <i class="fas fa-phone"></i>
-                            <span id="displayPhone">+1 234 567 8900</span>
+                            <span id="displayPhone">{{admin.profile.country_code}} {{admin.profile.phone}}</span>
                         </div>
                     </div>
 
@@ -451,66 +507,63 @@
                         <div class="info-label">Country Code</div>
                         <div class="info-value">
                             <i class="fas fa-globe"></i>
-                            <span id="displayCountry">+1 (USA)</span>
+                            <span id="displayCountry">{{admin.profile.country_code}}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Edit Mode Section -->
             <div class="edit-section" id="editSection">
                 <h3>Edit Profile</h3>
-                <form>
+                <form id="editForm" method="POST" action="{% url 'admins_account' %}">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <label for="editName">Name</label>
-                        <input type="text" id="editName" value="John Doe">
+                        <label for="editName">Username</label>
+                        <input type="text" id="editName" name="username" value="{{admin.username}}" required>
                     </div>
 
                     <div class="form-group">
                         <label for="editEmail">Email</label>
-                        <input type="email" id="editEmail" value="john.doe@example.com">
+                        <input type="email" id="editEmail" name="email" value="{{admin.email}}" required>
                     </div>
 
                     <div class="form-group">
                         <label for="editCountryCode">Country Code</label>
-                        <select id="editCountryCode" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;">
-                            <option value="+1">+1 (USA)</option>
-                            <option value="+44">+44 (UK)</option>
-                            <option value="+91">+91 (India)</option>
-                            <option value="+61">+61 (Australia)</option>
-                            <option value="+81">+81 (Japan)</option>
+                        <select id="editCountryCode" name="country_code" required>
+                            <option value="+1" {% if admin.profile.country_code == "+1" %}selected{% endif %}>+1 (USA)</option>
+                            <option value="+44" {% if admin.profile.country_code == "+44" %}selected{% endif %}>+44 (UK)</option>
+                            <option value="+91" {% if admin.profile.country_code == "+91" %}selected{% endif %}>+91 (India)</option>
+                            <option value="+61" {% if admin.profile.country_code == "+61" %}selected{% endif %}>+61 (Australia)</option>
+                            <option value="+81" {% if admin.profile.country_code == "+81" %}selected{% endif %}>+81 (Japan)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="editPhone">Phone Number</label>
-                        <input type="tel" id="editPhone" value="234 567 8900">
+                        <input type="tel" id="editPhone" name="phone" value="{{admin.profile.phone}}" required>
                     </div>
 
                     <div class="edit-actions">
                         <button type="button" class="btn-cancel" onclick="cancelEdit()">
                             <i class="fas fa-times"></i> Cancel
                         </button>
-                        <button type="button" class="btn-save" onclick="saveChanges()">
+                        <button type="submit" class="btn-save">
                             <i class="fas fa-check"></i> Save Changes
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Logout Button -->
             <button class="logout-btn" onclick="handleLogout()">
                 <i class="fas fa-sign-out-alt"></i>
                 Logout
             </button>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2024 Dashboard. All rights reserved.</p>
         </footer>
 
-        <!-- Bottom Navigation (Mobile) -->
         <nav class="bottom-nav">
             <ul class="bottom-nav-list">
                 <li class="bottom-nav-item">
@@ -536,18 +589,39 @@
     </div>
 
     <script>
+        // Show Django messages as toasts and auto-remove them
+        document.addEventListener('DOMContentLoaded', function() {
+            const djangoToasts = document.getElementById('djangoToasts');
+            if (djangoToasts) {
+                const toasts = djangoToasts.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    setTimeout(() => {
+                        toast.style.animation = 'fadeOut 0.4s ease forwards';
+                        setTimeout(() => toast.remove(), 400);
+                    }, 3000);
+                });
+            }
+        });
+
+        // Custom toast function for client-side notifications
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.4s ease forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
         function toggleEditMode() {
             const editSection = document.getElementById('editSection');
-            const infoCard = document.getElementById('infoCard');
-            
             editSection.classList.toggle('active');
             
             if (editSection.classList.contains('active')) {
-                // Populate edit form with current values
-                document.getElementById('editName').value = document.getElementById('displayName').textContent;
-                document.getElementById('editEmail').value = document.getElementById('displayEmail').textContent;
-                
-                // Scroll to edit section
                 editSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
@@ -557,36 +631,10 @@
             editSection.classList.remove('active');
         }
 
-        function saveChanges() {
-            // Get values from edit form
-            const name = document.getElementById('editName').value;
-            const email = document.getElementById('editEmail').value;
-            const countryCode = document.getElementById('editCountryCode').value;
-            const countryText = document.getElementById('editCountryCode').selectedOptions[0].textContent;
-            const phone = document.getElementById('editPhone').value;
-
-            // Update display values
-            document.getElementById('displayName').textContent = name;
-            document.getElementById('displayEmail').textContent = email;
-            document.getElementById('displayPhone').textContent = countryCode + ' ' + phone;
-            document.getElementById('displayCountry').textContent = countryText;
-
-            // Update avatar initials
-            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-            document.querySelector('.avatar').textContent = initials;
-
-            // Hide edit section
-            cancelEdit();
-
-            // Show success message (you can implement a toast notification here)
-            alert('Profile updated successfully!');
-        }
-
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                // Implement logout logic here
-                alert('Logging out...');
-                // window.location.href = 'login.html';
+                showToast('Logging out...', 'success');
+                window.location.href = "{% url 'admins_logout' %}";
             }
         }
     </script>

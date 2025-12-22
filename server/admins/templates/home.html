@@ -5,753 +5,291 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #ffffff;
             color: #1f2937;
         }
 
-        .container {
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        /* Navbar */
-        .navbar {
+        /* ================= TOAST ================= */
+        .toast-container {
             position: fixed;
-            top: 0;
-            left: 260px;
-            right: 0;
-            height: 70px;
-            background: white;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 2rem;
-            z-index: 90;
-        }
-
-        .navbar-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1f2937;
-        }
-
-        .navbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .notification-btn {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            background: #f3f4f6;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #6b7280;
-            transition: all 0.2s;
-        }
-
-        .notification-btn:hover {
-            background: #e5e7eb;
-            color: #2563eb;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            background: #ef4444;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.5rem 1rem;
-            background: #f9fafb;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .user-menu:hover {
-            background: #f3f4f6;
-        }
-
-        .user-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .user-info {
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
+            gap: 10px;
         }
 
-        .user-name {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #1f2937;
+        .toast {
+            min-width: 260px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 3s forwards;
         }
 
-        .user-role {
-            font-size: 0.75rem;
-            color: #6b7280;
+        .toast-success { background: #16a34a; }
+        .toast-error { background: #dc2626; }
+        .toast-warning { background: #f59e0b; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Sidebar Navigation */
+        @keyframes fadeOut {
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* ================= LAYOUT ================= */
+        .container { display: flex; min-height: 100vh; }
         .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
             width: 260px;
-            height: 100vh;
             background: #f9fafb;
             border-right: 1px solid #e5e7eb;
             padding: 2rem 0;
-            z-index: 100;
+            position: fixed;
+            height: 100vh;
         }
 
         .sidebar-brand {
             padding: 0 1.5rem;
-            margin-bottom: 2rem;
             font-size: 1.5rem;
             font-weight: bold;
             color: #2563eb;
+            margin-bottom: 2rem;
         }
 
-        .sidebar-nav {
-            list-style: none;
-        }
-
-        .sidebar-nav li {
-            margin-bottom: 0.5rem;
-        }
-
+        .sidebar-nav { list-style: none; }
         .sidebar-nav a {
             display: flex;
             align-items: center;
             padding: 0.75rem 1.5rem;
             color: #6b7280;
             text-decoration: none;
-            transition: all 0.2s;
         }
 
+        .sidebar-nav a.active,
         .sidebar-nav a:hover {
-            background: #e5e7eb;
-            color: #2563eb;
-        }
-
-        .sidebar-nav a.active {
             background: #dbeafe;
             color: #2563eb;
-            border-right: 3px solid #2563eb;
         }
 
-        .sidebar-nav i {
-            margin-right: 0.75rem;
-            width: 20px;
+        .sidebar-nav i { margin-right: 0.75rem; }
+
+        .navbar {
+            position: fixed;
+            left: 260px;
+            right: 0;
+            top: 0;
+            height: 70px;
+            background: #fff;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 100;
         }
 
-        /* Main Content */
         .main-content {
             margin-left: 260px;
             margin-top: 70px;
-            flex: 1;
             padding: 2rem;
-            padding-bottom: 80px;
+            width: 100%;
         }
 
-        /* Summary Cards */
-        .summary-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .summary-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .summary-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .summary-icon {
-            width: 50px;
-            height: 50px;
-            background: #dbeafe;
-            border-radius: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #2563eb;
-            font-size: 1.5rem;
-        }
-
-        .summary-info h3 {
-            font-size: 1.75rem;
-            font-weight: bold;
-            color: #1f2937;
-        }
-
-        .summary-info p {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-        }
-
-        /* User List Section */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .section-header h2 {
-            font-size: 1.5rem;
-            color: #1f2937;
-        }
-
-        .btn-primary {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: background 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: #1d4ed8;
-        }
-
-        .user-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
+        /* ================= USERS ================= */
         .user-card {
             background: white;
             padding: 1.5rem;
             border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            transition: transform 0.2s;
+            margin-bottom: 1rem;
         }
 
-        .user-card:hover {
-            transform: translateX(4px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        .badge-success { background: #dcfce7; color: #166534; padding: 5px 10px; border-radius: 999px; }
+        .badge-danger { background: #fee2e2; color: #991b1b; padding: 5px 10px; border-radius: 999px; }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
         }
 
-        .user-info {
-            flex: 1;
-        }
+        .edit-btn { background: #dbeafe; color: #2563eb; }
+        .delete-btn { background: #fee2e2; color: #dc2626; }
 
-        .user-name {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.25rem;
-        }
-
-        .user-details {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-        }
-
-        .user-detail-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .badge {
-            padding: 0.375rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .badge-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-danger {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        /* Footer */
-        .footer {
-            background: #f9fafb;
-            border-top: 1px solid #e5e7eb;
-            padding: 1.5rem;
-            text-align: center;
-            color: #6b7280;
-            font-size: 0.875rem;
-            margin-left: 260px;
-        }
-
-        /* Modal */
+        /* ================= MODAL ================= */
         .modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
+            inset: 0;
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
-            animation: fadeIn 0.2s;
-        }
-
-        .modal.active {
-            display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        .modal.active { display: flex; }
+
         .modal-content {
-            background: white;
-            border-radius: 1rem;
+            background: #fff;
             padding: 2rem;
+            border-radius: 1rem;
             width: 90%;
             max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            animation: slideUp 0.3s;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-header h3 {
-            font-size: 1.5rem;
-            color: #1f2937;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6b7280;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151;
-            font-size: 0.875rem;
-        }
-
-        .form-group input,
-        .form-group select {
+        .form-group { margin-bottom: 1rem; }
+        .form-group input, select {
             width: 100%;
-            padding: 0.75rem;
+            padding: 10px;
+            border-radius: 6px;
             border: 1px solid #d1d5db;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
         }
 
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
+        .form-actions { display: flex; gap: 1rem; }
 
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-cancel {
-            flex: 1;
-            padding: 0.75rem;
-            background: #f3f4f6;
-            color: #374151;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-submit {
-            flex: 1;
-            padding: 0.75rem;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .btn-submit:hover {
-            background: #1d4ed8;
-        }
-
-        /* Bottom Navigation (Mobile) */
-        .bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            padding: 0.75rem;
-            z-index: 100;
-        }
-
-        .bottom-nav-list {
-            display: flex;
-            justify-content: space-around;
-            list-style: none;
-        }
-
-        .bottom-nav-item a {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            color: #6b7280;
-            text-decoration: none;
-            font-size: 0.75rem;
-            padding: 0.5rem;
-            transition: color 0.2s;
-        }
-
-        .bottom-nav-item a i {
-            font-size: 1.25rem;
-        }
-
-        .bottom-nav-item a.active {
-            color: #2563eb;
-        }
-
-        /* Mobile Styles */
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-
-            .navbar {
-                left: 0;
-                padding: 0 1rem;
-            }
-
-            .navbar-title {
-                font-size: 1.25rem;
-            }
-
-            .user-info {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0;
-                margin-top: 70px;
-                padding: 1rem;
-                padding-bottom: 100px;
-            }
-
-            .footer {
-                margin-left: 0;
-                padding-bottom: 70px;
-            }
-
-            .bottom-nav {
-                display: block;
-            }
-
-            .summary-cards {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .summary-card {
-                padding: 1rem;
-            }
-
-            .user-details {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .btn-primary {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+        .btn-submit { background: #2563eb; color: #fff; padding: 10px; border: none; border-radius: 6px; }
+        .btn-cancel { background: #e5e7eb; padding: 10px; border: none; border-radius: 6px; }
+        .btn-delete { background: #dc2626; color: white; padding: 10px; border: none; border-radius: 6px; }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- Navbar -->
-        <nav class="navbar">
-            <div class="navbar-title">Dashboard</div>
-            <div class="navbar-actions">
-                
-               
-            </div>
-        </nav>
 
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-brand">
-                <i class="fas fa-cube"></i> Dashboard
-            </div>
-            <ul class="sidebar-nav">
-                <li><a href="{% url 'admins_home' %}" class="active"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="{% url 'admins_products' %}"><i class="fas fa-box"></i> Products</a></li>
-                <li><a href="{% url 'admins_account' %}"><i class="fas fa-user"></i> Account</a></li>
-            </ul>
-        </aside>
+<!-- ================= DJANGO TOAST ================= -->
+{% if messages %}
+<div class="toast-container">
+    {% for message in messages %}
+        <div class="toast toast-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Summary Cards -->
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="summary-info">
-                        <h3>{{ totalUsers }}</h3>
-                        <p>Total Users</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-user-slash"></i>
-                    </div>
-                    <div class="summary-info">
-                        <h3>{{ deletedUser }}</h3>
-                        <p>Deleted Users</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-box"></i>
-                    </div>
-                    <div class="summary-info">
-                        <h3>{{ totalProduct }}</h3>
-                        <p>Total Products</p>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon">
-                        <i class="fas fa-box-open"></i>
-                    </div>
-                    <div class="summary-info">
-                        <h3>{{ deletedProduct }}</h3>
-                        <p>Deleted Products</p>
-                    </div>
-                </div>
-            </div>
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-brand">Dashboard</div>
+        <ul class="sidebar-nav">
+            <li><a href="{% url 'admins_home' %}" class="active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="{% url 'admins_products' %}"><i class="fas fa-box"></i> Products</a></li>
+            <li><a href="{% url 'admins_account' %}"><i class="fas fa-user"></i> Account</a></li>
+        </ul>
+    </aside>
 
-            <!-- User List Section -->
-            <div class="section-header">
-                <h2>Users</h2>
-                <button class="btn-primary" onclick="openModal()">
-                    <i class="fas fa-plus"></i> Add User
+    <div class="navbar">Dashboard</div>
+
+    <main class="main-content">
+        <h2>Users</h2>
+
+        {% for user in users %}
+        <div class="user-card">
+            <div>
+                <strong>{{ user.user.username }}</strong><br>
+                {{ user.user.email }}
+            </div>
+            <div>
+                <span class="{% if not user.is_deleted %}badge-success{% else %}badge-danger{% endif %}">
+                    {% if not user.is_deleted %}Active{% else %}Deleted{% endif %}
+                </span>
+
+                <button class="action-btn edit-btn"
+                    onclick="openEditModal('{{ user.user.id }}','{{ user.user.username }}','{{ user.user.email }}','{{ user.country_code }}','{{ user.phone }}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+
+                <button class="action-btn delete-btn"
+                    onclick="openDeleteModal('{{ user.user.id }}','{{ user.user.username }}')">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
-            
-            <div class="user-list">
-                {% for user in users %}
-                <div class="user-card">
-                    <div class="user-info">
-                        <div class="user-name">{{ user.user.username }}</div>
-                        <div class="user-details">
-                            <div class="user-detail-item">
-                                <i class="fas fa-envelope"></i>
-                                <span>{{ user.user.email }}</span>
-                            </div>
-                            <div class="user-detail-item">,
-                                <i class="fas fa-phone"></i>
-                                <span>+{{ user.country_code }} {{ user.phone }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <span class="badge badge-success">{% if not user.is_deleted %}Active{% else %}Deleted{% endif %}</span>
-                </div>
-                {% endfor %}
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2024 Dashboard. All rights reserved.</p>
-        </footer>
-
-        <!-- Bottom Navigation (Mobile) -->
-        <nav class="bottom-nav">
-            <ul class="bottom-nav-list">
-                <li class="bottom-nav-item">
-                    <a href="{% url 'admins_home' %}" class="active">
-                        <i class="fas fa-home"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="bottom-nav-item">
-                    <a href="{% url 'admins_products' %}">
-                        <i class="fas fa-box"></i>
-                        <span>Products</span>
-                    </a>
-                </li>
-                <li class="bottom-nav-item">
-                    <a href="{% url 'admins_account' %}">
-                        <i class="fas fa-user"></i>
-                        <span>Account</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <!-- Add User Modal -->
-    <div class="modal" id="addUserModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New User</h3>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            <form>
-                <div class="form-group">
-                    <label for="userName">Name</label>
-                    <input type="text" id="userName" placeholder="Enter name">
-                </div>
-                <div class="form-group">
-                    <label for="userEmail">Email</label>
-                    <input type="email" id="userEmail" placeholder="Enter email">
-                </div>
-                <div class="form-group">
-                    <label for="countryCode">Country Code</label>
-                    <select id="countryCode">
-                        <option value="+1">+1 (USA)</option>
-                        <option value="+44">+44 (UK)</option>
-                        <option value="+91">+91 (India)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="userNumber">Phone Number</label>
-                    <input type="tel" id="userNumber" placeholder="Enter phone number">
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-submit">Submit</button>
-                </div>
-            </form>
         </div>
+        {% endfor %}
+    </main>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal" id="editUserModal">
+    <div class="modal-content">
+        <h3>Edit User</h3>
+        <form method="POST" id="editUserForm">
+            {% csrf_token %}
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+                <input id="editUserName" name="username">
+            </div>
+            <div class="form-group">
+                <input id="editUserEmail" name="email">
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('editUserModal')">Cancel</button>
+                <button type="submit" class="btn-submit">Update</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        function openModal() {
-            document.getElementById('addUserModal').classList.add('active');
+<div class="modal" id="deleteUserModal">
+    <div class="modal-content">
+        <h3>Delete User</h3>
+        <p>Delete <strong id="deleteUsername"></strong>?</p>
+        <form method="POST" id="deleteUserForm">
+            {% csrf_token %}
+            <input type="hidden" id="deleteUserId">
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" onclick="closeModal('deleteUserModal')">Cancel</button>
+                <button type="submit" class="btn-delete">Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+    function showToast(message, type="success") {
+        let container = document.querySelector(".toast-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.className = "toast-container";
+            document.body.appendChild(container);
         }
+        const toast = document.createElement("div");
+        toast.className = `toast toast-${type}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
 
-        function closeModal() {
-            document.getElementById('addUserModal').classList.remove('active');
-        }
+    function openEditModal(id, name, email) {
+        document.getElementById("editUserName").value = name;
+        document.getElementById("editUserEmail").value = email;
+        document.getElementById("editUserForm").action = `/admins/user/edit/${id}/`;
+        document.getElementById("editUserModal").classList.add("active");
+        showToast(`Editing ${name}`, "warning");
+    }
 
-        // Close modal on outside click
-        document.getElementById('addUserModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-    </script>
+    function openDeleteModal(id, name) {
+        document.getElementById("deleteUsername").innerText = name;
+        document.getElementById("deleteUserForm").action = `/admins/user/delete/${id}/`;
+        document.getElementById("deleteUserModal").classList.add("active");
+        showToast(`Deleting ${name}`, "error");
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove("active");
+    }
+</script>
+
 </body>
 </html>

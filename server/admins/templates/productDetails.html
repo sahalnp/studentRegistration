@@ -679,9 +679,9 @@
                 <i class="fas fa-cube"></i> Dashboard
             </div>
             <ul class="sidebar-nav">
-                <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="products.html" class="active"><i class="fas fa-box"></i> Products</a></li>
-                <li><a href="account.html"><i class="fas fa-user"></i> Account</a></li>
+                <li><a href="{% url 'admins_home' %}"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="{% url 'admins_products' %}" class="active"><i class="fas fa-box"></i> Products</a></li>
+                <li><a href="{% url 'admins_account' %}"><i class="fas fa-user"></i> Account</a></li>
             </ul>
         </aside>
 
@@ -691,38 +691,56 @@
                 <!-- Image Section -->
                 <div class="image-section">
                     <div class="main-image-container">
-                        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop" alt="Product" class="main-image" id="mainImage">
+                        {% if product_images.main_image %}
+                            <img src="{{ product_images.main_image.url }}" alt="{{ product.name }}" class="main-image" id="mainImage">
+                        {% else %}
+                            <img src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22%3E%3Crect fill=%22%23f3f4f6%22 width=%22100%22 height=%22100%22/%3E%3Ctext fill=%22%239ca3af%22 font-family=%22Arial%22 font-size=%2214%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22%3ENo Image%3C/text%3E%3C/svg%3E" alt="No image" class="main-image" id="mainImage">
+                        {% endif %}
                     </div>
                     <div class="thumbnail-list">
-                        <div class="thumbnail active" onclick="changeImage(this, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=600&fit=crop')">
-                            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop" alt="Thumbnail">
+                        {% if product_images.main_image %}
+                        <div class="thumbnail active" onclick="changeImage(this, '{{ product_images.main_image.url }}')">
+                            <img src="{{ product_images.main_image.url }}" alt="Main Image">
                         </div>
-                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=600&h=600&fit=crop')">
-                            <img src="https://images.unsplash.com/photo-1484704849700-f032a568e944?w=200&h=200&fit=crop" alt="Thumbnail">
+                        {% endif %}
+                        {% if product_images.image_side %}
+                        <div class="thumbnail" onclick="changeImage(this, '{{ product_images.image_side.url }}')">
+                            <img src="{{ product_images.image_side.url }}" alt="Side Image">
                         </div>
-                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1545127398-14699f92334b?w=600&h=600&fit=crop')">
-                            <img src="https://images.unsplash.com/photo-1545127398-14699f92334b?w=200&h=200&fit=crop" alt="Thumbnail">
+                        {% endif %}
+                        {% if product_images.image_back %}
+                        <div class="thumbnail" onclick="changeImage(this, '{{ product_images.image_back.url }}')">
+                            <img src="{{ product_images.image_back.url }}" alt="Back Image">
                         </div>
-                        <div class="thumbnail" onclick="changeImage(this, 'https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=600&h=600&fit=crop')">
-                            <img src="https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=200&h=200&fit=crop" alt="Thumbnail">
+                        {% endif %}
+                        {% if product_images.image_up %}
+                        <div class="thumbnail" onclick="changeImage(this, '{{ product_images.image_up.url }}')">
+                            <img src="{{ product_images.image_up.url }}" alt="Top Image">
                         </div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <!-- Info Section -->
                 <div class="info-section">
-                    <span class="product-category">Electronics</span>
-                    <h1 class="product-title">Premium Wireless Headphones with Active Noise Cancellation</h1>
+                    <span class="product-category">{{ product.category.category_name }}</span>
+                    <h1 class="product-title">{{ product.name }}</h1>
                     
                     <div class="product-status">
-                        <span class="status-badge status-active">
-                            <i class="fas fa-check-circle"></i> Active
-                        </span>
+                        {% if product.active %}
+                            <span class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i> Active
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-inactive">
+                                <i class="fas fa-times-circle"></i> Inactive
+                            </span>
+                        {% endif %}
                     </div>
 
                     <div class="price-section">
                         <div class="price-label">Price</div>
-                        <div class="price">$199.99</div>
+                        <div class="price">${{ product.price }}</div>
                     </div>
 
                     <button class="buy-now-btn">
@@ -734,30 +752,20 @@
                         <div class="info-title">Product Information</div>
                         <div class="info-row">
                             <span class="info-label">Product ID</span>
-                            <span class="info-value">#PRD-12345</span>
+                            <span class="info-value">#{{ product.uid }}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Category</span>
-                            <span class="info-value">Electronics</span>
+                            <span class="info-value">{{ product.category.category_name }}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Status</span>
-                            <span class="info-value">Active</span>
+                            <span class="info-value">{% if product.active %}Active{% else %}Inactive{% endif %}</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Added Date</span>
-                            <span class="info-value">Jan 15, 2024</span>
+                            <span class="info-value">{{ product.created_at|date:"M d, Y" }}</span>
                         </div>
-                    </div>
-
-                    <div class="product-info-card">
-                        <div class="info-title">Product Description</div>
-                        <p style="color: #6b7280; line-height: 1.6;">
-                            Experience superior sound quality with our premium wireless headphones. 
-                            Featuring advanced active noise cancellation technology, comfortable 
-                            over-ear design, and long-lasting battery life. Perfect for music lovers, 
-                            commuters, and professionals who demand the best audio experience.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -771,47 +779,64 @@
                 <h3>Edit Product</h3>
                 <button class="close-btn" onclick="closeEditModal()">&times;</button>
             </div>
-            <form onsubmit="handleEdit(event)">
+            <form id="editForm" method="POST" action="{% url 'admins_edit_product' product.uid %}" enctype="multipart/form-data">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="editName">Product Name</label>
-                    <input type="text" id="editName" value="Premium Wireless Headphones with Active Noise Cancellation">
+                    <input type="text" id="editName" name="name" value="{{ product.name }}" required>
                 </div>
                 <div class="form-group">
                     <label for="editPrice">Price</label>
-                    <input type="number" id="editPrice" value="199.99" step="0.01">
+                    <input type="number" id="editPrice" name="price" value="{{ product.price }}" step="0.01" required>
                 </div>
                 <div class="form-group">
                     <label for="editCategory">Category</label>
-                    <select id="editCategory">
-                        <option value="electronics" selected>Electronics</option>
-                        <option value="fashion">Fashion</option>
-                        <option value="sports">Sports</option>
-                        <option value="accessories">Accessories</option>
-                    </select>
+                    <input type="text" id="editCategory" name="category" value="{{ product.category.category_name }}" required>
                 </div>
                 <div class="form-group">
                     <label for="mainImage">Main Image</label>
-                    <input type="file" id="mainImage" accept="image/*">
+                    <input type="file" id="mainImage" name="main_image" accept="image/*">
+                    {% if product_images.main_image %}
+                        <div style="margin-top: 0.5rem;">
+                            <img src="{{ product_images.main_image.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="sideImage">Side Image</label>
-                    <input type="file" id="sideImage" accept="image/*">
+                    <input type="file" id="sideImage" name="image_side" accept="image/*">
+                    {% if product_images.image_side %}
+                        <div style="margin-top: 0.5rem;">
+                            <img src="{{ product_images.image_side.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="backImage">Back Image</label>
-                    <input type="file" id="backImage" accept="image/*">
+                    <input type="file" id="backImage" name="image_back" accept="image/*">
+                    {% if product_images.image_back %}
+                        <div style="margin-top: 0.5rem;">
+                            <img src="{{ product_images.image_back.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="upImage">Top Image</label>
-                    <input type="file" id="upImage" accept="image/*">
+                    <input type="file" id="upImage" name="image_up" accept="image/*">
+                    {% if product_images.image_up %}
+                        <div style="margin-top: 0.5rem;">
+                            <img src="{{ product_images.image_up.url }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 0.5rem;">
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label>Active Status</label>
                     <div class="toggle-wrapper">
-                        <div class="toggle active" id="editToggle" onclick="toggleEditActive()">
+                        <div class="toggle {% if product.active %}active{% endif %}" id="editToggle" onclick="toggleEditActive()">
                             <div class="toggle-circle"></div>
                         </div>
-                        <span id="editToggleLabel">Active</span>
+                        <span id="editToggleLabel">{% if product.active %}Active{% else %}Inactive{% endif %}</span>
+                        <input type="hidden" name="active" id="editActiveInput" value="{% if product.active %}true{% else %}false{% endif %}">
                     </div>
                 </div>
                 <div class="form-actions">
@@ -839,17 +864,20 @@
                     <i class="fas fa-trash-alt"></i>
                 </div>
                 <h4>Are you sure?</h4>
-                <p>Do you really want to delete this product? This action cannot be undone.</p>
+                <p>Do you really want to delete <strong>{{ product.name }}</strong>? This action cannot be undone.</p>
             </div>
-            <div class="form-actions">
-                <button type="button" class="btn-cancel" onclick="closeDeleteModal()" id="deleteCancelBtn">
-                    Cancel
-                </button>
-                <button type="button" class="btn-delete-confirm" onclick="handleDelete()" id="deleteConfirmBtn">
-                    <span id="deleteBtnText">Delete Product</span>
-                    <div class="spinner" id="deleteSpinner" style="display: none;"></div>
-                </button>
-            </div>
+            <form id="deleteForm" method="POST" action="{% url 'admins_delete_product' product.uid %}">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeDeleteModal()" id="deleteCancelBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-delete-confirm" id="deleteConfirmBtn">
+                        <span id="deleteBtnText">Delete Product</span>
+                        <div class="spinner" id="deleteSpinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -878,36 +906,16 @@
         function toggleEditActive() {
             const toggle = document.getElementById('editToggle');
             const label = document.getElementById('editToggleLabel');
+            const input = document.getElementById('editActiveInput');
             toggle.classList.toggle('active');
-            label.textContent = toggle.classList.contains('active') ? 'Active' : 'Inactive';
+            const isActive = toggle.classList.contains('active');
+            label.textContent = isActive ? 'Active' : 'Inactive';
+            input.value = isActive ? 'true' : 'false';
         }
 
         function handleEdit(event) {
             event.preventDefault();
-            
-            const submitBtn = document.getElementById('editSubmitBtn');
-            const cancelBtn = document.getElementById('editCancelBtn');
-            const btnText = document.getElementById('editBtnText');
-            const spinner = document.getElementById('editSpinner');
-            
-            // Disable buttons and show spinner
-            submitBtn.disabled = true;
-            cancelBtn.disabled = true;
-            btnText.style.display = 'none';
-            spinner.style.display = 'block';
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Re-enable buttons and hide spinner
-                submitBtn.disabled = false;
-                cancelBtn.disabled = false;
-                btnText.style.display = 'block';
-                spinner.style.display = 'none';
-                
-                // Close modal and show success
-                closeEditModal();
-                alert('Product updated successfully!');
-            }, 2000);
+            document.getElementById('editForm').submit();
         }
 
         // Delete Modal
@@ -920,30 +928,7 @@
         }
 
         function handleDelete() {
-            const deleteBtn = document.getElementById('deleteConfirmBtn');
-            const cancelBtn = document.getElementById('deleteCancelBtn');
-            const btnText = document.getElementById('deleteBtnText');
-            const spinner = document.getElementById('deleteSpinner');
-            
-            // Disable buttons and show spinner
-            deleteBtn.disabled = true;
-            cancelBtn.disabled = true;
-            btnText.style.display = 'none';
-            spinner.style.display = 'block';
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Close modal and redirect
-                closeDeleteModal();
-                alert('Product deleted successfully!');
-                // window.location.href = 'products.html';
-                
-                // Re-enable buttons (for demo purposes)
-                deleteBtn.disabled = false;
-                cancelBtn.disabled = false;
-                btnText.style.display = 'block';
-                spinner.style.display = 'none';
-            }, 2000);
+            document.getElementById('deleteForm').submit();
         }
 
         // Close modals on outside click
