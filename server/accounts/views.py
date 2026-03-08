@@ -74,18 +74,25 @@ def user_login(request):
         return redirect("user_profile")
 
     if request.method == "POST":
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = authenticate(username=username, password=password)
-
-        if user:
-            login(request, user)
-            messages.success(request, "Logged in successfully!")
-            return redirect("user_profile")
-
-        messages.error(request, "Invalid username or password!")
-        return redirect("user_login")
+        # Check if user with this email exists
+        try:
+            user_obj = User.objects.get(email=email)
+            # Authenticate with the username
+            user = authenticate(username=user_obj.username, password=password)
+            
+            if user:
+                login(request, user)
+                messages.success(request, "Logged in successfully!")
+                return redirect("user_profile")
+            else:
+                messages.error(request, "Incorrect password!")
+                return redirect("user_login")
+        except User.DoesNotExist:
+            messages.error(request, "User with this email does not exist!")
+            return redirect("user_login")
 
     return render(request, "account/login.html")
 

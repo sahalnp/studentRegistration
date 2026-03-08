@@ -294,16 +294,16 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="loginUsername" class="form-label"
-                        >Username or Email</label
+                    <label for="loginEmail" class="form-label"
+                        >Email</label
                     >
                     <div class="input-wrapper">
                         <input
-                            type="text"
-                            id="loginUsername"
-                            name="username"
+                            type="email"
+                            id="loginEmail"
+                            name="email"
                             class="form-input"
-                            placeholder="Enter your username"
+                            placeholder="Enter your email"
                         />
 
                         <svg
@@ -322,7 +322,7 @@
                     </div>
                     <div
                         class="error-message"
-                        id="loginUsernameError"
+                        id="loginEmailError"
                         role="alert"
                     ></div>
                 </div>
