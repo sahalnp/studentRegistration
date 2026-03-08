@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, date
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -29,14 +30,34 @@ def user_signup(request):
             return redirect("user_signup")
 
         phone = request.POST.get("phone")
-        country_code = request.POST.get("country_code")
+        # we no longer ask for country code during signup, keep default on model
+        # collect optional personal details if provided
+        dob = request.POST.get("date_of_birth") or None
+        gender = request.POST.get("gender") or None
+        age_val = None
+        if dob:
+            try:
+                dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+                # simple age calculation
+                today = date.today()
+                age_val = today.year - dob_date.year - (
+                    (today.month, today.day) < (dob_date.month, dob_date.day)
+                )
+            except Exception:
+                age_val = None
 
         # Create user
         try:
             user = User.objects.create_user(
                 username=username, email=email, password=password
             )
-            Profile.objects.create(phone=phone, country_code=country_code, user=user)
+            Profile.objects.create(
+                phone=phone,
+                date_of_birth=dob,
+                age=age_val,
+                gender=gender,
+                user=user,
+            )
 
             messages.success(request, "Account created successfully! Please login.")
             return redirect("user_login")
@@ -50,7 +71,7 @@ def user_signup(request):
 
 def user_login(request):
     if request.user.is_authenticated:
-        return redirect("user_home")
+        return redirect("user_profile")
 
     if request.method == "POST":
         username = request.POST.get("username")
@@ -61,7 +82,7 @@ def user_login(request):
         if user:
             login(request, user)
             messages.success(request, "Logged in successfully!")
-            return redirect("user_home")
+            return redirect("user_profile")
 
         messages.error(request, "Invalid username or password!")
         return redirect("user_login")
@@ -86,17 +107,38 @@ def user_profile(request):
         if User.objects.exclude(id=user.id).filter(email=email).exists():
             return JsonResponse({"error": "Email already taken!"}, status=400)
 
-        country_code = data.get("country_code")
         phone = data.get("phone")
+        dob = data.get("date_of_birth")
+        age = data.get("age")
+        gender = data.get("gender")
 
         # Save user
         user.username = username
         user.email = email
         user.save()
 
-        # Save profile
-        profile.country_code = country_code
-        profile.phone = phone
+        # Save profile fields (country code untouched)
+        if phone is not None:
+            profile.phone = phone
+        if dob:
+            profile.date_of_birth = dob
+            # recalc age if dob changed
+            try:
+                dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+                today = date.today()
+                profile.age = today.year - dob_date.year - (
+                    (today.month, today.day) < (dob_date.month, dob_date.day)
+                )
+            except Exception:
+                pass
+        if age and not dob:
+            # user supplied explicit age without changing dob
+            try:
+                profile.age = int(age)
+            except (ValueError, TypeError):
+                pass
+        if gender is not None:
+            profile.gender = gender
         profile.save()
 
         # RETURN JSON ✔️
@@ -104,14 +146,19 @@ def user_profile(request):
             "message": "Profile updated successfully!",
             "username": user.username,
             "email": user.email,
-            "country_code": profile.country_code,
-            "phone": profile.phone
+            "phone": profile.phone,
+            "date_of_birth": profile.date_of_birth,
+            "age": profile.age,
+            "gender": profile.gender,
         }, status=200)
 
     return render(request, "account/profile.html", {"user": request.user})
 
 
+@login_required
 def user_logout(request):
-    logout(request)
-    messages.success(request, "Logged out successfully!")
-    return redirect("user_login")
+    if request.method == "POST":
+        logout(request)
+        messages.success(request, "Logged out successfully!")
+        return redirect("user_login")
+    return redirect("user_profile")

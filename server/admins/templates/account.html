@@ -499,15 +499,31 @@
                         <div class="info-label">Phone Number</div>
                         <div class="info-value">
                             <i class="fas fa-phone"></i>
-                            <span id="displayPhone">{{admin.profile.country_code}} {{admin.profile.phone}}</span>
+                            <span id="displayPhone">{{admin.profile.phone}}</span>
                         </div>
                     </div>
 
                     <div class="info-item">
-                        <div class="info-label">Country Code</div>
+                        <div class="info-label">Date of Birth</div>
                         <div class="info-value">
-                            <i class="fas fa-globe"></i>
-                            <span id="displayCountry">{{admin.profile.country_code}}</span>
+                            <i class="fas fa-birthday-cake"></i>
+                            <span id="displayDob">{{admin.profile.date_of_birth}}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Age</div>
+                        <div class="info-value">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span id="displayAge">{{admin.profile.age}}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Gender</div>
+                        <div class="info-value">
+                            <i class="fas fa-venus-mars"></i>
+                            <span id="displayGender">{{admin.profile.get_gender_display}}</span>
                         </div>
                     </div>
                 </div>
@@ -528,13 +544,20 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="editCountryCode">Country Code</label>
-                        <select id="editCountryCode" name="country_code" required>
-                            <option value="+1" {% if admin.profile.country_code == "+1" %}selected{% endif %}>+1 (USA)</option>
-                            <option value="+44" {% if admin.profile.country_code == "+44" %}selected{% endif %}>+44 (UK)</option>
-                            <option value="+91" {% if admin.profile.country_code == "+91" %}selected{% endif %}>+91 (India)</option>
-                            <option value="+61" {% if admin.profile.country_code == "+61" %}selected{% endif %}>+61 (Australia)</option>
-                            <option value="+81" {% if admin.profile.country_code == "+81" %}selected{% endif %}>+81 (Japan)</option>
+                        <label for="editDob">Date of Birth</label>
+                        <input type="date" id="editDob" name="date_of_birth" value="{{admin.profile.date_of_birth}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editAge">Age</label>
+                        <input type="number" id="editAge" name="age" min="0" value="{{admin.profile.age}}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editGender">Gender</label>
+                        <select id="editGender" name="gender">
+                            <option value="" {% if not admin.profile.gender %}selected{% endif %}></option>
+                            <option value="M" {% if admin.profile.gender == "M" %}selected{% endif %}>Male</option>
+                            <option value="F" {% if admin.profile.gender == "F" %}selected{% endif %}>Female</option>
+                            <option value="O" {% if admin.profile.gender == "O" %}selected{% endif %}>Other</option>
                         </select>
                     </div>
 

@@ -1,875 +1,570 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>BlueCart - My Profile</title>
-        <style>
-            .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #2563eb;
-    color: white;
-    padding: 14px 20px;
-    border-radius: 8px;
-    margin-top: 10px;
-    animation: fadeInOut 3s ease forwards;
-    z-index: 9999;
-}
-.toast.error { background:#ef4444; }
-.toast.success { background:#10b981; }
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-                background-color: #f5f5f5;
-                padding-top: 80px;
-                padding-bottom: 0;
-                min-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-
-            /* Modern Navbar */
-            .navbar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: #ffffff;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-                z-index: 1000;
-                padding: 0 30px;
-                border-bottom: 1px solid #e5e7eb;
-            }
-
-            .navbar-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 80px;
-                position: relative;
-            }
-
-            .navbar-logo {
-                position: absolute;
-                left: 0;
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #2563eb;
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .navbar-logo span {
-                font-size: 1.8rem;
-            }
-
-            .navbar-menu {
-                display: flex;
-                gap: 40px;
-                list-style: none;
-                align-items: center;
-            }
-
-            .navbar-menu a {
-                text-decoration: none;
-                color: #4b5563;
-                font-weight: 500;
-                font-size: 1rem;
-                transition: color 0.3s;
-                position: relative;
-            }
-
-            .navbar-menu a:hover {
-                color: #2563eb;
-            }
-
-            .navbar-menu a.active {
-                color: #2563eb;
-            }
-
-            .navbar-menu a.active::after {
-                content: "";
-                position: absolute;
-                bottom: -8px;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: #2563eb;
-            }
-
-            .mobile-menu-btn {
-                position: absolute;
-                right: 0;
-                display: none;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #4b5563;
-            }
-
-            /* Main Content Wrapper */
-            .main-content {
-                flex: 1;
-            }
-
-            /* Profile Header */
-            .profile-header {
-                background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-                color: white;
-                padding: 40px 20px;
-                text-align: center;
-                margin-bottom: 40px;
-            }
-
-            .profile-header h1 {
-                font-size: 2.5rem;
-                margin-bottom: 15px;
-                font-weight: 700;
-            }
-
-            .profile-header p {
-                font-size: 1.2rem;
-                opacity: 0.95;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-
-            /* Profile Container */
-            .profile-container {
-                max-width: 800px;
-                margin: 0 auto 50px;
-                padding: 0 20px;
-            }
-
-            /* Profile Card */
-            .profile-card {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                overflow: hidden;
-            }
-
-            .profile-card-header {
-                background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-                padding: 30px;
-                text-align: center;
-                position: relative;
-            }
-
-            .profile-avatar {
-                width: 120px;
-                height: 120px;
-                border-radius: 50%;
-                background: #2563eb;
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 3rem;
-                margin: 0 auto 15px;
-                border: 5px solid white;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            }
-
-            .edit-icon {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-                width: 45px;
-                height: 45px;
-                background: white;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                cursor: pointer;
-                font-size: 1.3rem;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s;
-            }
-
-            .edit-icon:hover {
-                background: #2563eb;
-                color: white;
-                transform: scale(1.1);
-            }
-
-            .profile-card-body {
-                padding: 40px;
-            }
-
-            /* Profile Fields */
-            .profile-field {
-                margin-bottom: 25px;
-            }
-
-            .profile-label {
-                display: block;
-                color: #6b7280;
-                font-size: 0.9rem;
-                font-weight: 600;
-                margin-bottom: 8px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            .profile-value {
-                display: block;
-                color: #1f2937;
-                font-size: 1.1rem;
-                padding: 12px 0;
-                border-bottom: 2px solid #f3f4f6;
-            }
-
-            .profile-input {
-                width: 100%;
-                padding: 12px 15px;
-                border: 2px solid #e5e7eb;
-                border-radius: 8px;
-                font-size: 1rem;
-                color: #1f2937;
-                transition: border-color 0.3s;
-            }
-
-            .profile-input:focus {
-                outline: none;
-                border-color: #2563eb;
-            }
-
-            /* Edit Mode */
-            .edit-mode .profile-value {
-                display: none;
-            }
-
-            .edit-mode .profile-input {
-                display: block;
-            }
-
-            .view-mode .profile-input {
-                display: none;
-            }
-
-            /* Action Buttons */
-            .action-buttons {
-                display: none;
-                gap: 15px;
-                margin-top: 30px;
-            }
-
-            .edit-mode .action-buttons {
-                display: flex;
-            }
-
-            .btn {
-                flex: 1;
-                padding: 12px 25px;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-
-            .btn-save {
-                background: #2563eb;
-                color: white;
-            }
-
-            .btn-save:hover {
-                background: #1d4ed8;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-            }
-
-            .btn-cancel {
-                background: #f3f4f6;
-                color: #4b5563;
-            }
-
-            .btn-cancel:hover {
-                background: #e5e7eb;
-            }
-
-            /* Logout Button */
-            .logout-section {
-                margin-top: 30px;
-                padding-top: 30px;
-                border-top: 2px solid #f3f4f6;
-                text-align: center;
-            }
-
-            .btn-logout {
-                background: #ef4444;
-                color: white;
-                padding: 12px 40px;
-                border: none;
-                border-radius: 8px;
-                font-size: 1rem;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
-
-            .btn-logout:hover {
-                background: #dc2626;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-            }
-
-            /* Modern Footer */
-            .footer {
-                background: #1f2937;
-                color: #ffffff;
-                padding: 60px 0 20px;
-                margin-top: 80px;
-            }
-
-            .footer-container {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 0 20px;
-            }
-
-            .footer-content {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 40px;
-                margin-bottom: 40px;
-            }
-
-            .footer-section h3 {
-                font-size: 1.2rem;
-                margin-bottom: 20px;
-                color: #ffffff;
-                font-weight: 600;
-            }
-
-            .footer-section ul {
-                list-style: none;
-            }
-
-            .footer-section ul li {
-                margin-bottom: 12px;
-            }
-
-            .footer-section ul li a {
-                color: #9ca3af;
-                text-decoration: none;
-                transition: color 0.3s;
-                font-size: 0.95rem;
-            }
-
-            .footer-section ul li a:hover {
-                color: #60a5fa;
-            }
-
-            .footer-section p {
-                color: #9ca3af;
-                line-height: 1.6;
-                font-size: 0.95rem;
-            }
-
-            .footer-logo {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #60a5fa;
-                margin-bottom: 15px;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .footer-social {
-                display: flex;
-                gap: 15px;
-                margin-top: 20px;
-            }
-
-            .social-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: #374151;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: #ffffff;
-                text-decoration: none;
-                transition: background 0.3s, transform 0.2s;
-                font-size: 1.2rem;
-            }
-
-            .social-icon:hover {
-                background: #60a5fa;
-                transform: translateY(-3px);
-            }
-
-            .footer-bottom {
-                border-top: 1px solid #374151;
-                padding-top: 30px;
-                text-align: center;
-            }
-
-            .footer-bottom p {
-                color: #9ca3af;
-                font-size: 0.9rem;
-            }
-
-            .footer-links {
-                display: flex;
-                justify-content: center;
-                gap: 30px;
-                margin-top: 15px;
-                flex-wrap: wrap;
-            }
-
-            .footer-links a {
-                color: #9ca3af;
-                text-decoration: none;
-                font-size: 0.9rem;
-                transition: color 0.3s;
-            }
-
-            .footer-links a:hover {
-                color: #60a5fa;
-            }
-
-            /* Mobile Menu */
-            @media (max-width: 768px) {
-                .navbar-menu {
-                    position: fixed;
-                    top: 80px;
-                    left: -100%;
-                    width: 100%;
-                    height: calc(100vh - 80px);
-                    background: white;
-                    flex-direction: column;
-                    gap: 0;
-                    padding: 20px;
-                    transition: left 0.3s;
-                }
-
-                .navbar-menu.active {
-                    left: 0;
-                }
-
-                .navbar-menu li {
-                    width: 100%;
-                    padding: 15px 0;
-                    border-bottom: 1px solid #f3f4f6;
-                }
-
-                .mobile-menu-btn {
-                    display: block;
-                }
-
-                .profile-header h1 {
-                    font-size: 2rem;
-                }
-
-                .profile-header p {
-                    font-size: 1rem;
-                }
-
-                .profile-card-body {
-                    padding: 30px 20px;
-                }
-
-                .action-buttons {
-                    flex-direction: column;
-                }
-
-                .footer-content {
-                    grid-template-columns: 1fr;
-                    gap: 30px;
-                }
-
-                .footer-links {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Modern Navbar -->
-        <nav class="navbar">
-            <div class="navbar-container">
-                <a href="/user/home/" class="navbar-logo">
-                    <span>🛒</span>
-                    BlueCart
-                </a>
-
-                <ul class="navbar-menu" id="navbarMenu">
-                    <li><a href="/user/home/">Home</a></li>
-                    <li><a href="/user/products/">Products</a></li>
-                    <li>
-                        <a href="/account/profile/" class="active">Account</a>
-                    </li>
-                </ul>
-
-                <div class="navbar-actions">
-                    <button class="mobile-menu-btn" id="mobileMenuBtn">
-                        ☰
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Main Content Wrapper -->
-        <div class="main-content">
-            <!-- Profile Header -->
-            <div class="profile-header">
-                <h1>My Profile</h1>
-                <p>Manage your account information and preferences</p>
-            </div>
-
-            <!-- Profile Container -->
-            <div class="profile-container">
-                <div class="profile-card view-mode" id="profileCard">
-                    <!-- Profile Card Header -->
-                    <div class="profile-card-header">
-                        <div class="profile-avatar">👤</div>
-                        <div
-                            class="edit-icon"
-                            id="editBtn"
-                            title="Edit Profile"
-                        >
-                            ✏️
-                        </div>
-                    </div>
-
-                    <!-- Profile Card Body -->
-                    <div class="profile-card-body">
-                        <!-- Username Field -->
-                        <div class="profile-field">
-                            <label class="profile-label">Username</label>
-                            <span class="profile-value" id="usernameDisplay"
-                                >{{ user.username }}</span
-                            >
-                            <input
-                                type="text"
-                                class="profile-input"<
-                                id="usernameInput"
-                                value="{{ user.username }}"
-                            />
-                        </div>
-
-                        <!-- Email Field -->
-                        <div class="profile-field">
-                            <label class="profile-label">Email Address</label>
-                            <span class="profile-value" id="emailDisplay"
-                                >{{ user.email }}</span
-                            >
-                            <input
-                                type="email"
-                                class="profile-input"
-                                id="emailInput"
-                                value="{{ user.email }}"
-                            />
-                        </div>
-
-<div class="profile-field">
-    <label class="profile-label">Country Code</label>
-    <span class="profile-value" id="countryCodeDisplay">{{ user.profile.country_code }}</span>
-    <input
-        type="text"
-        maxlength="4"
-        class="profile-input"
-        id="countryCodeInput"
-        value="{{ user.profile.country_code }}"
-        oninput="this.value = this.value.replace(/[^0-9+]/g,'')"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>User Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #2563eb;
+      --blue-dark:   #1d4ed8;
+      --blue-light:  #eff6ff;
+      --blue-mid:    #bfdbfe;
+      --danger:      #e53e3e;
+      --danger-light:#fff5f5;
+      --bg:          #f0f4fb;
+      --card:        #ffffff;
+      --text:        #1a1d2e;
+      --muted:       #6b7280;
+      --faint:       #a0aec0;
+      --border:      #e2e8f0;
+      --shadow:      0 8px 40px rgba(37,99,235,0.10), 0 2px 8px rgba(0,0,0,0.06);
+      --shadow-h:    0 16px 56px rgba(37,99,235,0.16), 0 4px 16px rgba(0,0,0,0.08);
+      --r:           20px;
+      --r-sm:        12px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 32px 16px;
+      background-image:
+        radial-gradient(ellipse at 20% 15%, rgba(37,99,235,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgba(37,99,235,0.05) 0%, transparent 55%);
+    }
+
+    /* ── Card ── */
+    .profile-card {
+      background: var(--card);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      width: 100%; max-width: 520px;
+      overflow: hidden;
+      transition: box-shadow 0.3s ease;
+    }
+    .profile-card:hover { box-shadow: var(--shadow-h); }
+
+    /* ── Banner ── */
+    .card-banner {
+      height: 100px;
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%);
+      position: relative;
+    }
+    .card-banner::after {
+      content:'';
+      position:absolute; inset:0;
+      background: url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='26' cy='26' r='18' fill='none' stroke='%23ffffff' stroke-width='0.6' stroke-opacity='0.12'/%3E%3C/svg%3E") repeat;
+    }
+
+    /* ── Avatar ── */
+    .avatar-wrap {
+      display: flex; justify-content: center;
+      margin-top: -48px; position: relative; z-index: 2;
+    }
+    .avatar-ring {
+      width: 96px; height: 96px; border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      box-shadow: 0 4px 20px rgba(37,99,235,0.32);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .avatar-ring .avatar-letter {
+      width: 90px; height: 90px; border-radius: 50%;
+      border: 3px solid white;
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; font-weight: 600; color: white;
+      font-family: 'Playfair Display', serif;
+    }
+    .avatar-status {
+      position: absolute; bottom: 4px;
+      right: calc(50% - 48px + 4px);
+      width: 14px; height: 14px;
+      background: #22c55e; border: 2.5px solid white; border-radius: 50%;
+    }
+
+    /* ── Identity header ── */
+    .profile-identity {
+      text-align: center;
+      padding: 12px 24px 16px;
+      position: relative;
+    }
+    .profile-identity h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; color: var(--text); letter-spacing: -0.02em;
+    }
+    .role-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 6px; padding: 4px 14px;
+      background: var(--blue-light); color: var(--blue);
+      border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .role-badge::before {
+      content:''; width:6px; height:6px;
+      background: var(--blue); border-radius: 50%;
+    }
+
+    /* single edit pencil icon in header */
+    .header-edit-btn {
+      position: absolute; top: 14px; right: 20px;
+      width: 34px; height: 34px; border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; color: var(--muted);
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .header-edit-btn:hover {
+      background: var(--blue-light); border-color: var(--blue);
+      color: var(--blue); transform: scale(1.08);
+    }
+    /* hide the header edit btn while in edit mode */
+    .profile-card.editing .header-edit-btn { display: none; }
+
+    /* ── Divider ── */
+    .divider { height:1px; background: var(--border); margin: 0 24px; }
+
+    /* ── Details ── */
+    .details-section { padding: 20px 28px; }
+    .section-label {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--faint); margin-bottom: 16px;
+    }
+
+    .detail-row {
+      display: flex; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+
+    .detail-icon {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: var(--blue-light);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 0.95rem;
+    }
+
+    .detail-info { flex:1; min-width:0; }
+    .detail-info .lbl {
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: var(--faint);
+      line-height:1; margin-bottom: 3px;
+    }
+    .detail-info .val {
+      font-size: 0.9rem; font-weight: 500; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .edit-input {
+      display: none;
+      width: 100%;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 500; color: var(--text);
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 8px;
+      padding: 6px 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .edit-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+
+    /* select styling for edit mode */
+    select.edit-input {
+      display: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232563eb' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 28px;
+    }
+
+    /* toggle view ↔ edit */
+    .profile-card.editing .val        { display: none !important; }
+    .profile-card.editing .edit-input { display: block !important; }
+    .profile-card.editing select.edit-input { display: block !important; }
+
+    /* ── Action Buttons ── */
+    .action-area {
+      padding: 20px 28px 28px;
+      display: flex; gap: 12px;
+    }
+
+    .btn {
+      flex:1; padding: 13px 20px;
+      border-radius: var(--r-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all 0.22s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37,99,235,0.45);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-danger {
+      background: var(--danger-light); color: var(--danger);
+      border: 1.5px solid #fecaca;
+    }
+    .btn-danger:hover {
+      background: var(--danger); color: white;
+      border-color: var(--danger);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(229,62,62,0.3);
+    }
+    .btn-danger:active { transform: translateY(0); }
+
+    /* submit / cancel only visible in edit mode */
+    .btn-submit {
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+      display: none;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(37,99,235,0.45);
+    }
+
+    .btn-cancel {
+      background: #f1f5f9; color: var(--muted);
+      border: 1.5px solid var(--border);
+      display: none;
+    }
+    .btn-cancel:hover {
+      background: #e2e8f0; color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    /* swap buttons */
+    .profile-card.editing .btn-default { display: none; }
+    .profile-card.editing .btn-submit  { display: flex; }
+    .profile-card.editing .btn-cancel  { display: flex; }
+
+    /* ── Toast Notification ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: white;
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-h);
+      padding: 16px 20px;
+      max-width: 360px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 9999;
+      animation: slideIn 0.3s ease, slideOut 0.3s ease 4.7s;
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .toast.success {
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+
+    .toast.error {
+      border-left: 4px solid #e53e3e;
+      color: #742a2a;
+    }
+
+    .toast-icon {
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 400px) {
+      .profile-card { border-radius: 16px; }
+      .details-section { padding: 16px 20px; }
+      .action-area { padding: 16px 20px 24px; flex-direction: column; }
+      .toast {
+        bottom: 16px; right: 16px; left: 16px; max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<form id="logout-form" method="POST" action="/account/logout/" style="display:none;">
+  {% csrf_token %}
+</form>
+
+<div class="profile-card" id="card">
+
+  <!-- Banner -->
+  <div class="card-banner"></div>
+
+  <!-- Avatar -->
+  <div class="avatar-wrap">
+    <div class="avatar-ring">
+      <div class="avatar-letter">{% if user.first_name %}{{ user.first_name|first|upper }}{% else %}{{ user.username|first|upper }}{% endif %}</div>
+    </div>
+    <div class="avatar-status"></div>
+  </div>
+
+  <!-- Identity + single edit icon -->
+  <div class="profile-identity">
+    <h1>{% if user.first_name %}{{ user.first_name }}{% if user.last_name %} {{ user.last_name }}{% endif %}{% else %}{{ user.username }}{% endif %}</h1>
+    <span class="role-badge">Student</span>
+    <button class="header-edit-btn" title="Edit Profile" onclick="enterEdit()">✏️</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Details -->
+  <div class="details-section">
+    <div class="section-label">Account Information</div>
+
+    <div class="detail-row">
+      <div class="detail-icon">👤</div>
+      <div class="detail-info">
+        <div class="lbl">Username</div>
+        <div class="val">{{ user.username }}</div>
+        <input class="edit-input" type="text" value="{{ user.username }}" data-field="username"/>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-icon">✉️</div>
+      <div class="detail-info">
+        <div class="lbl">Email</div>
+        <div class="val">{{ user.email }}</div>
+        <input class="edit-input" type="email" value="{{ user.email }}" data-field="email"/>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-icon">📱</div>
+      <div class="detail-info">
+        <div class="lbl">Phone Number</div>
+        <div class="val">{{ user.profile.phone|default:"Not provided" }}</div>
+        <input class="edit-input" type="tel" value="{{ user.profile.phone|default:"" }}" data-field="phone"/>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-icon">🎂</div>
+      <div class="detail-info">
+        <div class="lbl">Date of Birth</div>
+        <div class="val">{% if user.profile.date_of_birth %}{{ user.profile.date_of_birth|date:"F d, Y" }}{% else %}Not provided{% endif %}</div>
+        <input class="edit-input" type="date" value="{% if user.profile.date_of_birth %}{{ user.profile.date_of_birth|date:"Y-m-d" }}{% endif %}" data-field="date_of_birth"/>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-icon">🪪</div>
+      <div class="detail-info">
+        <div class="lbl">Gender</div>
+        <div class="val">{% if user.profile.gender %}{% if user.profile.gender == 'M' %}Male{% elif user.profile.gender == 'F' %}Female{% else %}Other{% endif %}{% else %}Not provided{% endif %}</div>
+        <select class="edit-input" data-field="gender">
+          <option value="">Select Gender</option>
+          <option value="M" {% if user.profile.gender == 'M' %}selected{% endif %}>Male</option>
+          <option value="F" {% if user.profile.gender == 'F' %}selected{% endif %}>Female</option>
+          <option value="O" {% if user.profile.gender == 'O' %}selected{% endif %}>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-icon">⏳</div>
+      <div class="detail-info">
+        <div class="lbl">Age</div>
+        <div class="val">{% if user.profile.age %}{{ user.profile.age }} years old{% else %}Not provided{% endif %}</div>
+        <input class="edit-input" type="number" value="{{ user.profile.age|default:"" }}" data-field="age"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Buttons -->
+  <div class="action-area">
+    <button class="btn btn-primary btn-default" onclick="enterEdit()">✏️ Edit Profile</button>
+    <button class="btn btn-danger btn-default" onclick="logout()">🚪 Logout</button>
+    <button class="btn btn-submit" onclick="submitEdit()">✅ Submit</button>
+    <button class="btn btn-cancel" onclick="cancelEdit()">✕ Cancel</button>
+  </div>
+
 </div>
-
-<!-- PHONE (view + edit) -->
-<div class="profile-field">
-    <label class="profile-label">Phone Number</label>
-    <span class="profile-value" id="phoneDisplay">{{ user.profile.phone }}</span>
-    <input
-        type="tel"
-        maxlength="10"
-        class="profile-input"
-        id="phoneInput"
-        value="{{ user.profile.phone }}"
-        oninput="this.value = this.value.replace(/[^0-9]/g,'').slice(0,10)"
-    />
-</div>
-
-
-                        <!-- Action Buttons (Hidden by default) -->
-                        <div class="action-buttons">
-                            <button class="btn btn-cancel" id="cancelBtn">
-                                ❌ Cancel
-                            </button>
-                            <button class="btn btn-save" id="saveBtn">
-                                💾 Save Changes
-                            </button>
-                        </div>
-
-                        <form action="/account/logout/" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-logout">
-                                🚪 Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modern Footer -->
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-content">
-                    <!-- About Section -->
-                    <div class="footer-section">
-                        <div class="footer-logo">
-                            <span>🛒</span>
-                            BlueCart
-                        </div>
-                        <p>
-                            Your one-stop destination for quality products at
-                            amazing prices. Shop with confidence and enjoy
-                            lightning-fast delivery.
-                        </p>
-                        <div class="footer-social">
-                            <a href="#" class="social-icon" title="Facebook"
-                                >📘</a
-                            >
-                            <a href="#" class="social-icon" title="Twitter"
-                                >🐦</a
-                            >
-                            <a href="#" class="social-icon" title="Instagram"
-                                >📷</a
-                            >
-                            <a href="#" class="social-icon" title="LinkedIn"
-                                >💼</a
-                            >
-                        </div>
-                    </div>
-
-                    <!-- Quick Links -->
-                    <div class="footer-section">
-                        <h3>Quick Links</h3>
-                        <ul>
-                            <li><a href="/user/home/">Home</a></li>
-                            <li><a href="/user/products/">Products</a></li>
-                            <li><a href="#">Categories</a></li>
-                            <li><a href="#">Deals</a></li>
-                            <li><a href="#">About Us</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Customer Service -->
-                    <div class="footer-section">
-                        <h3>Customer Service</h3>
-                        <ul>
-                            <li><a href="#">Contact Us</a></li>
-                            <li><a href="#">Shipping Info</a></li>
-                            <li><a href="#">Returns & Exchanges</a></li>
-                            <li><a href="#">FAQ</a></li>
-                            <li><a href="#">Track Order</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- My Account -->
-                    <div class="footer-section">
-                        <h3>My Account</h3>
-                        <ul>
-                            <li><a href="/account/profile/">My Profile</a></li>
-                            <li><a href="#">Order History</a></li>
-                            <li><a href="#">Wishlist</a></li>
-                            <li><a href="#">Newsletter</a></li>
-                            <li><a href="#">Gift Cards</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Footer Bottom -->
-                <div class="footer-bottom">
-                    <p>&copy; 2025 BlueCart. All rights reserved.</p>
-                    <div class="footer-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
-                        <a href="#">Sitemap</a>
-                    </div>
-                </div>
-            </div>
-        </footer>
-
-        <script>
-            // Mobile Menu Toggle
-            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
-            const navbarMenu = document.getElementById("navbarMenu");
-
-            mobileMenuBtn.addEventListener("click", () => {
-                navbarMenu.classList.toggle("active");
-                mobileMenuBtn.textContent = navbarMenu.classList.contains(
-                    "active"
-                )
-                    ? "✕"
-                    : "☰";
-            });
-
-            // Close mobile menu when clicking outside
-            document.addEventListener("click", (e) => {
-                if (!e.target.closest(".navbar")) {
-                    navbarMenu.classList.remove("active");
-                    mobileMenuBtn.textContent = "☰";
-                }
-            });
-
-            // Profile Edit Functionality
-            const profileCard = document.getElementById("profileCard");
-            const editBtn = document.getElementById("editBtn");
-            const saveBtn = document.getElementById("saveBtn");
-            const cancelBtn = document.getElementById("cancelBtn");
-
-            const usernameDisplay = document.getElementById("usernameDisplay");
-            const emailDisplay = document.getElementById("emailDisplay");
-            const phoneDisplay = document.getElementById("phoneDisplay");
-
-            const usernameInput = document.getElementById("usernameInput");
-            const emailInput = document.getElementById("emailInput");
-            const phoneInput = document.getElementById("phoneInput");
-
-            // Store original values
-            let originalValues = {
-                username: usernameInput.value,
-                email: emailInput.value,
-                phone: phoneInput.value,
-            };
-
-            // Edit button click
-            editBtn.addEventListener("click", () => {
-                profileCard.classList.remove("view-mode");
-                profileCard.classList.add("edit-mode");
-            });
-
-            // Save button click
-            saveBtn.addEventListener("click", () => {
-                // Update display values
-                usernameDisplay.textContent = usernameInput.value;
-                emailDisplay.textContent = emailInput.value;
-                phoneDisplay.textContent = phoneInput.value;
-
-                // Update original values
-                originalValues = {
-                    username: usernameInput.value,
-                    email: emailInput.value,
-                    phone: phoneInput.value,
-                };
-
-                // Switch back to view mode
-                profileCard.classList.remove("edit-mode");
-                profileCard.classList.add("view-mode");
-
-            
-            });
-
-            // Cancel button click
-            cancelBtn.addEventListener("click", () => {
-                // Restore original values
-                usernameInput.value = originalValues.username;
-                emailInput.value = originalValues.email;
-                phoneInput.value = originalValues.phone;
-
-                // Switch back to view mode
-                profileCard.classList.remove("edit-mode");
-                profileCard.classList.add("view-mode");
-            });
-
-            // Logout button click
-            const logoutBtn = document.getElementById("logoutBtn");
-            logoutBtn.addEventListener("click", () => {
-                if (confirm("Are you sure you want to logout?")) {                 
-                    alert("Logging out...");
-                }
-            });
-
-            // Smooth scroll for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-                anchor.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(
-                        this.getAttribute("href")
-                    );
-                    if (target) {
-                        target.scrollIntoView({ behavior: "smooth" });
-                    }
-                    // Close mobile menu after click
-                    navbarMenu.classList.remove("active");
-                    mobileMenuBtn.textContent = "☰";
-                });
-            });
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <script>
-saveBtn.addEventListener("click", () => {
+  let originals = {};
 
-    const body = {
-        username: usernameInput.value,
-        email: emailInput.value,
-        country_code: countryCodeInput.value,
-        phone: phoneInput.value
-    };
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icon = type === 'success' ? '✓' : '✕';
+    toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.remove();
+    }, 5000);
+  }
 
-    axios.put("/account/profile/", body, {
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}"
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
-    })
-    .then((res) => {
+      }
+    }
+    return cookieValue;
+  }
 
-        // Update UI values
-        usernameDisplay.textContent = res.data.username;
-        emailDisplay.textContent = res.data.email;
-        countryCodeDisplay.textContent = res.data.country_code;
-        phoneDisplay.textContent = res.data.phone;
-
-        // Switch to view mode
-        profileCard.classList.remove("edit-mode");
-        profileCard.classList.add("view-mode");
-
-        // Toast
-        const t = document.createElement("div");
-        t.className = "toast success";
-        t.innerHTML = "Profile updated successfully!";
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
-    })
-    .catch((err) => {
-        const t = document.createElement("div");
-        t.className = "toast error";
-        t.innerHTML = err.response.data.error || "Update failed!";
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 3000);
+  function enterEdit() {
+    const card = document.getElementById('card');
+    const inputs = card.querySelectorAll('.edit-input');
+    
+    console.log('Edit clicked, inputs found:', inputs.length);
+    
+    // Store original values
+    originals = {};
+    inputs.forEach((input) => {
+      const val = input.value;
+      originals[input.dataset.field] = val;
+      console.log('Storing:', input.dataset.field, '=', val);
     });
-});
-</script>
-{% if messages %}
-<div id="toastBox">
-    {% for m in messages %}
-        <div class="toast {{ m.tags }}">{{ m }}</div>
-    {% endfor %}
-</div>
-{% endif %}
+    
+    card.classList.add('editing');
+    console.log('Editing class added, has class now:', card.classList.contains('editing'));
+  }
 
-    </body>
+  function cancelEdit() {
+    const card = document.getElementById('card');
+    const inputs = card.querySelectorAll('.edit-input');
+    
+    inputs.forEach((input) => {
+      const field = input.dataset.field;
+      if (originals[field] !== undefined) {
+        input.value = originals[field];
+      }
+    });
+    
+    card.classList.remove('editing');
+    console.log('Edit cancelled');
+  }
+
+  function submitEdit() {
+    const card = document.getElementById('card');
+    const inputs = card.querySelectorAll('.edit-input');
+    
+    // Build data object
+    const data = {};
+    inputs.forEach((input) => {
+      const field = input.dataset.field;
+      data[field] = input.value;
+    });
+    
+    // Send to backend
+    const csrftoken = getCookie('csrftoken');
+    fetch('{% url "user_profile" %}', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken,
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || 'Update failed');
+        });
+      }
+      return response.json();
+    })
+    .then(result => {
+      // Update display values based on response
+      const vals = card.querySelectorAll('.val');
+      
+      vals.forEach((val, index) => {
+        const input = inputs[index];
+        const field = input.dataset.field;
+        
+        if (field === 'gender') {
+          const genderMap = { 'M': 'Male', 'F': 'Female', 'O': 'Other' };
+          val.textContent = genderMap[result[field]] || 'Not provided';
+        } else if (field === 'date_of_birth') {
+          if (result[field]) {
+            const date = new Date(result[field]);
+            val.textContent = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          } else {
+            val.textContent = 'Not provided';
+          }
+        } else if (field === 'age') {
+          val.textContent = result[field] ? result[field] + ' years old' : 'Not provided';
+        } else if (field === 'phone') {
+          val.textContent = result[field] || 'Not provided';
+        } else {
+          val.textContent = result[field];
+        }
+      });
+      
+      card.classList.remove('editing');
+      showToast('Profile updated successfully!', 'success');
+    })
+    .catch(error => {
+      showToast('Error updating profile: ' + error.message, 'error');
+    });
+  }
+
+  function logout() {
+    // Submit the logout form
+    document.getElementById('logout-form').submit();
+  }
+</script>
+
+</body>
 </html>

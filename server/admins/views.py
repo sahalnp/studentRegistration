@@ -1,4 +1,5 @@
 import profile
+from datetime import datetime, date
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from accounts.models import Profile
@@ -286,10 +287,13 @@ def admin_profile(request):
     profile = user.profile  # ✅ FIXED
 
     if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-        country_code = request.POST["country_code"]
-        phone = request.POST["phone"]
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        country_code = request.POST.get("country_code")
+        phone = request.POST.get("phone")
+        dob = request.POST.get("date_of_birth")
+        age = request.POST.get("age")
+        gender = request.POST.get("gender")
 
         if User.objects.exclude(id=user.id).filter(username=username).exists():
             messages.error(request, "Username already taken")
@@ -312,6 +316,24 @@ def admin_profile(request):
 
         profile.country_code = country_code
         profile.phone = phone
+        if dob:
+            profile.date_of_birth = dob
+            # recalc age if needed
+            try:
+                dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+                today = date.today()
+                profile.age = today.year - dob_date.year - (
+                    (today.month, today.day) < (dob_date.month, dob_date.day)
+                )
+            except Exception:
+                pass
+        if age and not dob:
+            try:
+                profile.age = int(age)
+            except (ValueError, TypeError):
+                pass
+        if gender:
+            profile.gender = gender
         profile.save()
 
         messages.success(request, "Profile updated successfully")
